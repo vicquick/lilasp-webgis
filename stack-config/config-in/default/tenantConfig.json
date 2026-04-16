@@ -1,0 +1,77 @@
+{
+  "$schema": "https://github.com/qwc-services/qwc-config-generator/raw/master/schemas/qwc-config-generator.json",
+  "service": "config-generator",
+  "config": {
+    "autogen_keyvaltable_datasets": true,
+    "config_db_url": "postgresql:///?service=qwc_configdb",
+    "default_qgis_server_url": "http://qgis-server/ows/",
+    "generate_nested_nrel_forms": false,
+    "generate_wfs_services": true,
+    "permissions_default_allow": true,
+    "qgis_projects_base_dir": "/data",
+    "qgis_project_extension": ".qgs",
+    "qgis_projects_scan_base_dir": "/data",
+    "strip_scan_prefix_from_theme_names": false,
+    "tenant": "default",
+    "validate_schema": true,
+    "use_default_map_thumbnail": true
+  },
+  "themesConfig": "./themesConfig.json",
+  "services": [
+    {
+      "name": "adminGui",
+      "config": {
+        "config_generator_service_url": "http://qwc-config-service:9090",
+        "db_url": "postgresql:///?service=qwc_configdb",
+        "input_config_path": "/srv/qwc_service/config-in",
+        "default_qgis_server_url": "http://qgis-server/ows/",
+        "ows_prefix": "/ows",
+        "ows_service_url": "/ows",
+        "plugins": [],
+        "qwc2_path": "/qwc2",
+        "totp_enabled": false,
+        "user_info_fields": []
+      }
+    },
+    {
+      "name": "mapViewer",
+      "config": {
+        "auth_service_url": "/auth/",
+        "data_service_url": "/api/v1/data/",
+        "feature_info_service_url": "/api/v1/featureinfo/",
+        "permalink_service_url": "/api/v1/permalink/",
+        "print_service_url": "/api/v1/print/",
+        "qwc2_path": "/qwc2"
+      }
+    },
+    {
+      "name": "ogcService",
+      "config": {
+        "default_ogc_service_url": "http://qgis-server/ows/"
+      }
+    },
+    {
+      "name": "dataService",
+      "config": {
+        "db_url": "postgresql:///?service=qwc_configdb",
+        "geometry_default_allow_null": false
+      }
+    },
+    {
+      "name": "featureInfoService",
+      "config": {
+        "default_qgis_server_url": "http://qgis-server/ows/"
+      }
+    },
+    {
+      "name": "printService",
+      "config": {}
+    },
+    {
+      "name": "permalinkService",
+      "config": {
+        "db_url": "postgresql:///?service=qwc_configdb"
+      }
+    }
+  ]
+}
