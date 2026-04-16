@@ -81,8 +81,38 @@ services:
     depends_on:
       config-db-migrate:
         condition: service_completed_successfully
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:9090/ready || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
     networks:
       - webgis-internal
+
+  # ── Config trigger (one-shot: fixes volume ownership + fires generate_configs) ──
+  generate-config:
+    image: 'alpine:3.21'
+    container_name: lilasp-webgis-generate-config
+    command: >
+      sh -c "
+        chown -R 33:33 /config-out &&
+        echo 'Waiting for config service...' &&
+        until wget -qO- http://qwc-config-service:9090/ready 2>/dev/null; do sleep 3; done &&
+        echo 'Triggering config generation...' &&
+        wget -qO- 'http://qwc-config-service:9090/generate_configs?tenant=default' &&
+        echo 'Done'
+      "
+    volumes:
+      - qwc-config:/config-out
+    depends_on:
+      qwc-config-service:
+        condition: service_healthy
+      qgis-server:
+        condition: service_started
+    networks:
+      - webgis-internal
+    restart: 'no'
 
   # ── QGIS Server (sourcepole's optimized image) ────────────────────────────────
   qgis-server:
