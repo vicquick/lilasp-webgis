@@ -7,6 +7,7 @@
   "elevationServiceUrl": "",
   "featureReportService": "",
   "authServiceUrl": "/auth/",
+  "loginRequired": true,
   "routingServiceUrl": "https://valhalla1.openstreetmap.de",
   "availableLocales": {
     "en-US": "English",
@@ -107,6 +108,9 @@
         "name": "AttributeTable"
       },
       {
+        "name": "Login"
+      },
+      {
         "name": "BackgroundSwitcher",
         "cfg": {
           "position": 0
@@ -176,13 +180,6 @@
             "initialX": 0,
             "initialY": 0
           }
-        }
-      },
-      {
-        "name": "LayerCatalog",
-        "cfg": { "disabled": true },
-        "cfg": {
-          "catalogUrl": "https://qwc2.sourcepole.ch/assets/catalog.json"
         }
       },
       {
@@ -352,7 +349,6 @@
             {"key": "ThemeSwitcher", "icon": "themes", "shortcut": "alt+shift+t"},
             {"key": "LayerTree", "icon": "layers", "shortcut": "alt+shift+l"},
             {"key": "MapLegend", "icon": "list-alt"},
-            {"key": "LayerCatalog", "icon": "catalog", "shortcut": "alt+shift+c"},
             {"key": "FeatureSearch", "icon": "search"},
             {"key": "Share", "icon": "share", "shortcut": "alt+shift+s"},
             {"key": "Bookmark", "icon": "bookmark", "shortcut": "alt+shift+b"},

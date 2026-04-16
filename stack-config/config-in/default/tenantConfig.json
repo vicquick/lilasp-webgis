@@ -45,7 +45,7 @@
       },
       "generator_config": {
         "qwc2_config": {
-          "qwc2_config_file": "/srv/qwc_service/config.json",
+          "qwc2_config_file": "/srv/qwc_service/stack-config/qwc2-config.json",
           "qwc2_index_file": "/srv/qwc_service/config-in/default/index.html"
         }
       }
