@@ -1,0 +1,240 @@
+# lilasp-webgis — full QWC2 services stack
+# Managed via Coolify. All secrets via .env (never commit real values).
+# Data DBs (lilasp_wiesbaden etc.) live on host pg18:6432, accessed via host.docker.internal.
+# ConfigDB is included here as a sidecar container.
+#
+# Traefik routing: webgis-protect.yaml routes webgis.lilasp.de → lilasp-webgis-gateway
+# QGIS Desktop /wfs/ and /wms/ paths are untouched (different Coolify service).
+
+version: '3.8'
+
+services:
+
+  # ── ConfigDB ─────────────────────────────────────────────────────────────────
+  config-db:
+    image: 'postgres:16-alpine'
+    container_name: lilasp-webgis-configdb
+    environment:
+      POSTGRES_DB: qwc_config
+      POSTGRES_USER: qwc_config_admin
+      POSTGRES_PASSWORD: '${CONFIG_DB_PASSWORD}'
+    volumes:
+      - config-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U qwc_config_admin -d qwc_config']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - webgis-internal
+
+  # ── ConfigDB migrations (one-shot) ────────────────────────────────────────────
+  config-db-migrate:
+    image: 'sourcepole/qwc-config-service:2026-lts'
+    container_name: lilasp-webgis-migrate
+    entrypoint: ['flask', 'db', 'upgrade']
+    environment:
+      PGSERVICEFILE: /etc/pg_service.conf
+    volumes:
+      - './stack-config/pg_service.conf:/etc/pg_service.conf:ro'
+    depends_on:
+      config-db:
+        condition: service_healthy
+    networks:
+      - webgis-internal
+    restart: 'no'
+
+  # ── QWC Config Service ────────────────────────────────────────────────────────
+  qwc-config-service:
+    image: 'sourcepole/qwc-config-service:2026-lts'
+    container_name: lilasp-webgis-config
+    environment:
+      PGSERVICEFILE: /etc/pg_service.conf
+      JWT_SECRET_KEY: '${JWT_SECRET}'
+      INPUT_CONFIG_PATH: /srv/qwc_service/config/input
+      OUTPUT_CONFIG_PATH: /srv/qwc_service/config/output
+      GENERATE_DYNAMIC_KVRELS: '1'
+    volumes:
+      - './stack-config/pg_service.conf:/etc/pg_service.conf:ro'
+      - qwc-config:/srv/qwc_service/config
+      - '/var/www/qgis-projects:/io/data:ro'
+    depends_on:
+      config-db-migrate:
+        condition: service_completed_successfully
+    networks:
+      - webgis-internal
+
+  # ── QGIS Server (dedicated, separate from QGIS Desktop WFS/WMS server) ────────
+  qgis-server:
+    image: 'camptocamp/qgis-server:3.40'
+    container_name: lilasp-webgis-qgis
+    environment:
+      QGIS_SERVER_LOG_LEVEL: '1'
+      QGIS_SERVER_LOG_STDERR: '1'
+      QGIS_SERVER_PARALLEL_RENDERING: '1'
+    volumes:
+      - '/var/www/qgis-projects:/io/data:ro'
+    tmpfs:
+      - '/tmp/cache:size=128m'
+    networks:
+      - webgis-internal
+
+  # ── Auth Adapter (replaces qwc-auth-service, validates vs QFieldCloud) ─────────
+  auth-adapter:
+    build:
+      context: ./auth-adapter
+    container_name: lilasp-webgis-auth
+    environment:
+      QFC_BASE_URL: '${QFC_BASE_URL}'
+      JWT_SECRET: '${JWT_SECRET}'
+      JWT_EXPIRY_HOURS: '8'
+      FLASK_ENV: production
+    restart: unless-stopped
+    networks:
+      - webgis-internal
+
+  # ── OGC Service (WMS/WFS proxy with permission enforcement) ───────────────────
+  qwc-ogc-service:
+    image: 'sourcepole/qwc-ogc-service:2026-lts'
+    container_name: lilasp-webgis-ogc
+    environment:
+      PGSERVICEFILE: /etc/pg_service.conf
+      JWT_SECRET_KEY: '${JWT_SECRET}'
+      CONFIG_PATH: /srv/qwc_service/config/output
+    volumes:
+      - './stack-config/pg_service.conf:/etc/pg_service.conf:ro'
+      - qwc-config:/srv/qwc_service/config
+    networks:
+      - webgis-internal
+
+  # ── Data Service (REST CRUD for feature editing) ──────────────────────────────
+  qwc-data-service:
+    image: 'sourcepole/qwc-data-service:2026-lts'
+    container_name: lilasp-webgis-data
+    environment:
+      PGSERVICEFILE: /etc/pg_service.conf
+      JWT_SECRET_KEY: '${JWT_SECRET}'
+      MAX_ATTACHMENT_FILE_SIZE: '10485760'
+    volumes:
+      - './stack-config/pg_service.conf:/etc/pg_service.conf:ro'
+      - qwc-config:/srv/qwc_service/config
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    networks:
+      - webgis-internal
+
+  # ── Feature Info Service ──────────────────────────────────────────────────────
+  qwc-feature-info-service:
+    image: 'sourcepole/qwc-feature-info-service:2026-lts'
+    container_name: lilasp-webgis-featureinfo
+    environment:
+      PGSERVICEFILE: /etc/pg_service.conf
+      JWT_SECRET_KEY: '${JWT_SECRET}'
+    volumes:
+      - './stack-config/pg_service.conf:/etc/pg_service.conf:ro'
+      - qwc-config:/srv/qwc_service/config
+    networks:
+      - webgis-internal
+
+  # ── Print Service ─────────────────────────────────────────────────────────────
+  qwc-print-service:
+    image: 'sourcepole/qwc-print-service:2026-lts'
+    container_name: lilasp-webgis-print
+    environment:
+      JWT_SECRET_KEY: '${JWT_SECRET}'
+    volumes:
+      - qwc-config:/srv/qwc_service/config
+    networks:
+      - webgis-internal
+
+  # ── Permalink Service ─────────────────────────────────────────────────────────
+  qwc-permalink-service:
+    image: 'sourcepole/qwc-permalink-service:2026-lts'
+    container_name: lilasp-webgis-permalink
+    environment:
+      PGSERVICEFILE: /etc/pg_service.conf
+      JWT_SECRET_KEY: '${JWT_SECRET}'
+    volumes:
+      - './stack-config/pg_service.conf:/etc/pg_service.conf:ro'
+      - qwc-config:/srv/qwc_service/config
+    networks:
+      - webgis-internal
+
+  # ── Map Viewer (our custom build — QWC2 + shadcn/Recharts/lilasp plugins) ──────
+  qwc-map-viewer:
+    build:
+      context: .
+    container_name: lilasp-webgis-viewer
+    environment:
+      JWT_SECRET_KEY: '${JWT_SECRET}'
+      OWS_PREFIX: /ows
+      AUTH_SERVICE_URL: /auth/
+      DATA_SERVICE_URL: /api/v1/data/
+      INFO_SERVICE_URL: /api/v1/feature-info/
+      PRINT_SERVICE_URL: /api/v1/print/
+      PERMALINK_SERVICE_URL: /api/v1/permalink/
+    volumes:
+      - qwc-config:/srv/qwc_service/config
+    depends_on:
+      - qwc-config-service
+    networks:
+      - webgis-internal
+
+  # ── Admin GUI (internal only — not exposed via Traefik) ───────────────────────
+  qwc-admin-gui:
+    image: 'sourcepole/qwc-admin-gui:2026-lts'
+    container_name: lilasp-webgis-admin
+    environment:
+      PGSERVICEFILE: /etc/pg_service.conf
+      JWT_SECRET_KEY: '${JWT_SECRET}'
+      ADMIN_GUI_ALLOW_SETUP_WIZARD: 'false'
+    volumes:
+      - './stack-config/pg_service.conf:/etc/pg_service.conf:ro'
+      - qwc-config:/srv/qwc_service/config
+    networks:
+      - webgis-internal
+      - coolify
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=coolify'
+      - 'traefik.http.routers.webgis-admin.rule=Host(`webgis-admin.lilasp.de`)'
+      - 'traefik.http.routers.webgis-admin.entrypoints=https'
+      - 'traefik.http.routers.webgis-admin.tls=true'
+      - 'traefik.http.routers.webgis-admin.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.webgis-admin.middlewares=vpn-only@file'
+      - 'traefik.http.services.webgis-admin.loadbalancer.server.port=5030'
+
+  # ── API Gateway (nginx, public entry point via Traefik) ───────────────────────
+  qwc-api-gateway:
+    image: 'nginx:1.27-alpine'
+    container_name: lilasp-webgis-gateway
+    volumes:
+      - './stack-config/api-gateway.conf:/etc/nginx/conf.d/default.conf:ro'
+    depends_on:
+      - auth-adapter
+      - qwc-config-service
+      - qwc-ogc-service
+      - qwc-data-service
+      - qwc-feature-info-service
+      - qwc-map-viewer
+    networks:
+      - webgis-internal
+      - coolify
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=coolify'
+      # priority 7000: below webgis-protect.yaml (8000) so QGIS /wfs/ /wms/ still win
+      # webgis-protect.yaml routes everything else here at priority 8000
+      - 'traefik.http.services.lilasp-webgis-gw.loadbalancer.server.port=80'
+    restart: unless-stopped
+
+volumes:
+  config-db-data:
+  qwc-config:
+
+networks:
+  webgis-internal:
+    name: webgis-internal
+  coolify:
+    external: true
+    name: coolify
