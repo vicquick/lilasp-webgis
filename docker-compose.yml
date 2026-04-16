@@ -1,7 +1,7 @@
 # lilasp-webgis — QWC2 services stack
 # Managed via Coolify from vicquick/lilasp-webgis (git).
 # All passwords via Coolify env vars — never committed to git.
-# Secrets pattern: init-secrets writes PG_SERVICE_CONF env var → /pg-config/pg_service.conf
+# Secrets pattern: init-secrets runs write-pg-service.sh → /pg-config/pg_service.conf (passwords from env vars)
 #
 # Traefik routing: webgis-protect.yaml (priority 8000) routes webgis.lilasp.de → gateway
 # QGIS Desktop /wfs/ and /wms/ paths stay on the existing QGIS Server (different Coolify service).
@@ -19,10 +19,12 @@ services:
     image: 'alpine:3.21'
     container_name: lilasp-webgis-init-secrets
     environment:
-      PG_SERVICE_CONF: '${PG_SERVICE_CONF}'
-    command: sh -c 'printf "%s" "$PG_SERVICE_CONF" > /pg-config/pg_service.conf && echo "pg_service.conf written"'
+      CONFIG_DB_PASSWORD: '${CONFIG_DB_PASSWORD}'
+      QWC_SERVICE_DB_PASSWORD: '${QWC_SERVICE_DB_PASSWORD}'
+    command: sh /stack-config/write-pg-service.sh
     volumes:
       - pg-config:/pg-config
+      - './stack-config/write-pg-service.sh:/stack-config/write-pg-service.sh:ro'
     restart: 'no'
 
   # ── ConfigDB (qwc-base-db includes PostGIS + qwc_admin/service roles) ────────
