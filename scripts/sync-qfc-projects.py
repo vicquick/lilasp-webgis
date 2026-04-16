@@ -127,12 +127,26 @@ def sync_project(token: str, project: dict, dry: bool) -> bool:
             log.warning("%s: multiple .qgs/.qgz (%s) — picking first", qfc_name, qgs_candidates)
         qgs_name = qgs_candidates[0]
 
-    # Main .qgs plus any _attachments.zip
+    # Main .qgs plus every non-QField-meta file the project might reference.
+    # QField's cloud projects carry their lookup CSVs / shapefiles / gpkg
+    # alongside the .qgs — all of these must land on disk or QGIS Server
+    # rejects layers as invalid.
+    SKIP_SUFFIXES = (".qfs",)
+    SKIP_NAMES = {"attachments.zip"}
     wanted = [qgs_name]
     for f in files:
         fname = f.get("name", "")
-        if fname.lower().endswith("_attachments.zip") or fname.lower() in {"attachments.zip"}:
-            wanted.append(fname)
+        low = fname.lower()
+        if fname == qgs_name:
+            continue
+        if low.endswith(SKIP_SUFFIXES):
+            continue
+        if low in SKIP_NAMES:
+            continue
+        # Skip the zipped attachments bundle (we sync individual files instead)
+        if low.endswith("_attachments.zip"):
+            continue
+        wanted.append(fname)
 
     for fname in wanted:
         file_rec = next((f for f in files if f.get("name") == fname), None)
@@ -141,7 +155,14 @@ def sync_project(token: str, project: dict, dry: bool) -> bool:
         remote_md5 = file_rec.get("md5sum")
         ext = Path(fname).suffix or ".qgs"
         is_main = fname == qgs_name
-        local = PROJECTS_DIR / (f"{mapped}{ext}" if is_main else f"{mapped}_attachments.zip")
+        # Main .qgs → mapped name; data files → preserve original name/subdir
+        # so relative references inside the .qgs resolve against /data/
+        if is_main:
+            local = PROJECTS_DIR / f"{mapped}{ext}"
+        else:
+            # fname may contain forward slashes (e.g. "Data/file.shp")
+            local = PROJECTS_DIR / fname
+            local.parent.mkdir(parents=True, exist_ok=True)
 
         if local.exists() and remote_md5:
             local_md5 = hashlib.md5(local.read_bytes()).hexdigest()

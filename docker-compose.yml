@@ -67,6 +67,19 @@ services:
   qwc-config-service:
     image: 'sourcepole/qwc-config-generator:latest-2026-lts'
     container_name: lilasp-webgis-config
+    # Patch sourcepole's config-generator at boot, then hand off to its default
+    # uwsgi command. Patches: null-safe print templates + demote duplicate
+    # layer names from critical → error so ignore_errors works.
+    entrypoint: ['sh', '-c']
+    command:
+      - >
+        /srv/qwc_service/stack-config/patch-config-generator.sh &&
+        HOME=/tmp exec uwsgi --http-socket :9090 --buffer-size $${REQ_HEADER_BUFFER_SIZE}
+        --processes $${UWSGI_PROCESSES} --threads $${UWSGI_THREADS} --plugins python3
+        $${UWSGI_EXTRA} --protocol uwsgi --wsgi-disable-file-wrapper
+        --uid $${SERVICE_UID} --gid $${SERVICE_GID} --master --chdir /srv/qwc_service
+        --virtualenv /srv/qwc_service/.venv --mount $${SERVICE_MOUNTPOINT}=server:app
+        --manage-script-name
     environment:
       <<: *qwc-service-env
       INPUT_CONFIG_PATH: '/srv/qwc_service/config-in'
