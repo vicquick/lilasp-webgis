@@ -13,11 +13,12 @@ COPY . .
 # Build production bundle
 RUN npm run build
 
-# Stage 2: serve with qwc-map-viewer Flask service
-FROM sourcepole/qwc-map-viewer:2026-lts
+# Stage 2: serve with qwc-map-viewer-base Flask service
+# qwc-map-viewer-base expects QWC2 assets at /qwc2/
+FROM sourcepole/qwc-map-viewer-base:latest-2026-lts
 
-# Replace stock QWC2 assets with our custom build
-COPY --from=builder /app/prod/ /srv/qwc_service/qwc2/
+# Copy our custom QWC2 build (dist/, assets/, translations/, data/, index.html)
+COPY --from=builder /app/prod/ /qwc2/
 
-# Config files are mounted at runtime via volume
-# JWT secret comes from environment
+# Config files mounted at runtime via Coolify volume (qwc-config)
+# JWT secret and pg_service from environment vars / pg-config volume
