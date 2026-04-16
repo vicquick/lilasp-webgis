@@ -229,11 +229,13 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=coolify'
-      - 'traefik.http.routers.webgis-admin.rule=Host(`webgis-admin.lilasp.de`)'
+      - 'traefik.http.routers.webgis-admin.rule=Host(`webgis.lilasp.de`) && PathPrefix(`/admin`)'
       - 'traefik.http.routers.webgis-admin.entrypoints=https'
       - 'traefik.http.routers.webgis-admin.tls=true'
       - 'traefik.http.routers.webgis-admin.tls.certresolver=letsencrypt'
-      - 'traefik.http.routers.webgis-admin.middlewares=vpn-only@file'
+      - 'traefik.http.routers.webgis-admin.priority=9000'
+      - 'traefik.http.routers.webgis-admin.middlewares=vpn-only@file,webgis-admin-strip'
+      - 'traefik.http.middlewares.webgis-admin-strip.stripprefix.prefixes=/admin'
       - 'traefik.http.services.webgis-admin.loadbalancer.server.port=5030'
 
   # ── API Gateway (nginx, public entry point → Traefik) ─────────────────────────
