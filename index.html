@@ -1,12 +1,15 @@
 <!-- Build version  <%= htmlWebpackPlugin.options.build %> -->
 <!DOCTYPE html>
-<html>
+<html lang="de">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" />
         <meta name="HandheldFriendly" content="true" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <title>QGIS Web Client</title>
+        <meta name="description" content="LILASp WebGIS — Kommunales Grün- und Spielplatz-Informationssystem" />
+        <title>LILASp WebGIS</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link rel="stylesheet" type="text/css" href="assets/css/qwc2.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/colorschemes.css" />
         <link rel="apple-touch-icon" href="assets/img/app_icon.png"/>
@@ -22,32 +25,43 @@
             top: 0;
             bottom: 0;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 20px;
+            background: oklch(38% 0.12 152);
+        }
+        .splash-wordmark {
+            font-family: 'Outfit', system-ui, sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 0.04em;
+            color: oklch(93% 0.04 152);
+            opacity: 0;
+            animation: splash-fade-in 0.6s ease 0.2s forwards;
         }
         .lds-dual-ring {
             display: inline-block;
-            width: 80px;
-            height: 80px;
+            width: 56px;
+            height: 56px;
         }
         .lds-dual-ring:after {
             content: " ";
             display: block;
-            width: 64px;
-            height: 64px;
-            margin: 8px;
+            width: 44px;
+            height: 44px;
+            margin: 6px;
             border-radius: 50%;
-            border: 6px solid #595959;
-            border-color: #595959 transparent #595959 transparent;
-            animation: lds-dual-ring 1.2s linear infinite;
+            border: 4px solid oklch(93% 0.04 152);
+            border-color: oklch(93% 0.04 152) transparent oklch(93% 0.04 152) transparent;
+            animation: lds-dual-ring 1.1s linear infinite;
         }
         @keyframes lds-dual-ring {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+            0%   { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes splash-fade-in {
+            to { opacity: 1; }
         }
         </style>
         <script type="text/javascript" src="assets/searchProviders.js" ></script>
@@ -58,8 +72,10 @@
         </script>
     </head>
     <body>
-        <div id="splash"><div class="lds-dual-ring"></div></div>
+        <div id="splash">
+            <div class="splash-wordmark">LILASp WebGIS</div>
+            <div class="lds-dual-ring"></div>
+        </div>
         <div id="container"></div>
     </body>
-
 </html>

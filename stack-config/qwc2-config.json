@@ -43,7 +43,6 @@
   "wmsMaxGetUrlLength": 2048,
   "qgisServerVersion": 3,
   "defaultColorScheme": "default",
-  "username": "admin",
   "defaultFeatureStyle": {
     "strokeColor": [0, 0, 255, 1],
     "strokeWidth": 1,
@@ -108,7 +107,7 @@
         "name": "AttributeTable"
       },
       {
-        "name": "Login"
+        "name": "Authentication"
       },
       {
         "name": "BackgroundSwitcher",
@@ -122,8 +121,8 @@
       {
         "name": "BottomBar",
         "cfg": {
-          "viewertitleUrl": "https://qwc-services.github.io/",
-          "termsUrl": "https://qwc-services.github.io/",
+          "viewertitleUrl": "https://lilasp.de",
+          "termsUrl": "https://lilasp.de",
           "viewertitleUrlTarget": "_blank"
         }
       },
@@ -305,19 +304,16 @@
         "name": "Portal",
         "cfg": {
           "logo": "logo.svg",
-          "topBarText": "",
+          "topBarText": "LILASp WebGIS",
           "showMenuOnStartup": true,
           "keepMenuOpen": true,
           "bottomBarLinks": [
-              {"href": "https://qwc-services.github.io/", "label": "Homepage", "target": "iframe"},
-              {"href": "https://qgis.org", "label": "QGIS.org"}
+              {"href": "https://lilasp.de", "label": "lilasp.de", "target": "_blank"}
           ],
           "menuItems": [
-              {"title": "Homepage", "icon": "info", "url": "https://qwc-services.github.io/", "target": "iframe"},
               {"key": "Tools", "icon": "tools", "title": "Links", "subitems": [
-                {"icon": "link", "title": "qwc2", "url": "https://github.com/qgis/qwc2/"},
-                {"icon": "link", "title": "qwc-docker", "url": "https://github.com/qwc-services/qwc-docker"},
-                {"icon": "link", "title": "qgis.org", "url": "https://qgis.org"}
+                {"icon": "link", "title": "QFieldCloud", "url": "https://qfield.lilasp.de"},
+                {"icon": "link", "title": "BIM", "url": "https://bim.lilasp.de"}
               ]}
           ]
         }
@@ -365,8 +361,7 @@
             ]},
             {"key": "Print", "icon": "print", "shortcut": "alt+shift+p"},
             {"key": "Help", "icon": "info", "shortcut": "alt+shift+h"},
-            {"key": "Settings", "icon": "cog"},
-            {"title": "Homepage", "icon": "link", "url": "https://qwc-services.github.io/", "target": "iframe"}
+            {"key": "Settings", "icon": "cog"}
           ],
           "searchOptions": {
             "allowSearchFilters": false,
@@ -375,10 +370,10 @@
             "zoomToLayers": false,
             "showProvidersInPlaceholder": false,
             "highlightStyle": {
-              "strokeColor": [255, 0, 0, 1],
-              "strokeWidth": 1,
-              "strokeDash": [4, 1],
-              "fillColor": [255, 0, 0, 0.33]
+              "strokeColor": [45, 106, 79, 1],
+              "strokeWidth": 2,
+              "strokeDash": [4, 2],
+              "fillColor": [45, 106, 79, 0.15]
             }
           },
           "appMenuClearsTask": true,
@@ -414,7 +409,7 @@
       {
         "name": "Share",
         "cfg": {
-          "showSocials": true,
+          "showSocials": false,
           "showLink": true,
           "showQRCode": true
         },
