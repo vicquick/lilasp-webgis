@@ -19,8 +19,7 @@
                         "url": "/ows/LILASp_Wiesbaden_Spielplaetze",
                         "attribution": "LILASp · Stadt Wiesbaden",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true},
-                            {"name": "basemapde-grau"}
+                            {"name": "osm", "printLayer": "osm", "visibility": true}
                         ],
                         "searchProviders": ["coordinates", "nominatim"],
                         "additionalMouseCrs": ["EPSG:4326"],
@@ -43,8 +42,7 @@
                         "url": "/ows/LILASp_Frankfurt_FFEP",
                         "attribution": "LILASp · Stadt Frankfurt",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true},
-                            {"name": "basemapde-grau"}
+                            {"name": "osm", "printLayer": "osm", "visibility": true}
                         ],
                         "searchProviders": ["coordinates", "nominatim"],
                         "additionalMouseCrs": ["EPSG:4326"],
@@ -58,8 +56,7 @@
                         "url": "/ows/LILASp_Frankfurt_Naturerlebnisprofile",
                         "attribution": "LILASp · Stadt Frankfurt",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true},
-                            {"name": "basemapde-grau"}
+                            {"name": "osm", "printLayer": "osm", "visibility": true}
                         ],
                         "searchProviders": ["coordinates", "nominatim"],
                         "additionalMouseCrs": ["EPSG:4326"],
@@ -73,8 +70,7 @@
                         "url": "/ows/LILASp_Frankfurt_Plaetze",
                         "attribution": "LILASp · Stadt Frankfurt",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true},
-                            {"name": "basemapde-grau"}
+                            {"name": "osm", "printLayer": "osm", "visibility": true}
                         ],
                         "searchProviders": ["coordinates", "nominatim"],
                         "additionalMouseCrs": ["EPSG:4326"],
@@ -88,8 +84,7 @@
                         "url": "/ows/LILASp_Frankfurt_Wege",
                         "attribution": "LILASp · Stadt Frankfurt",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true},
-                            {"name": "basemapde-grau"}
+                            {"name": "osm", "printLayer": "osm", "visibility": true}
                         ],
                         "searchProviders": ["coordinates", "nominatim"],
                         "additionalMouseCrs": ["EPSG:4326"],
@@ -122,8 +117,7 @@
                         "url": "/ows/LILASp_Cuxhaven_Spielplaetze",
                         "attribution": "LILASp · Stadt Cuxhaven",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true},
-                            {"name": "basemapde-grau"}
+                            {"name": "osm", "printLayer": "osm", "visibility": true}
                         ],
                         "searchProviders": ["coordinates", "nominatim"],
                         "additionalMouseCrs": ["EPSG:4326"],
@@ -162,18 +156,6 @@
                 "attribution": "© OpenStreetMap-Mitwirkende",
                 "attributionUrl": "https://www.openstreetmap.org/copyright",
                 "thumbnail": "img/mapthumbs/mapnik.jpg"
-            },
-            {
-                "name": "basemapde-grau",
-                "title": "basemap.de — Grau",
-                "type": "wmts",
-                "url": "https://sgx.geodatenzentrum.de/wmts_basemapde/1.0.0/WMTSCapabilities.xml",
-                "tileMatrixPrefix": "",
-                "tileMatrixSet": "DE_EPSG_25832_ADV",
-                "projection": "EPSG:25832",
-                "attribution": "© basemap.de · BKG",
-                "attributionUrl": "https://basemap.de/",
-                "thumbnail": "img/mapthumbs/default.jpg"
             }
         ]
     }
