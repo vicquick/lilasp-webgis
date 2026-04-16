@@ -75,6 +75,7 @@ services:
     volumes:
       - pg-config:/pg-config:ro
       - './stack-config/config-in:/srv/qwc_service/config-in:ro'
+      - './stack-config/qwc2-config.json:/srv/qwc_service/config.json:ro'
       - qwc-config:/srv/qwc_service/config-out
       - '/var/www/qgis-projects:/data:ro'
     depends_on:

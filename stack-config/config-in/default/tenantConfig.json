@@ -4,7 +4,7 @@
   "config": {
     "autogen_keyvaltable_datasets": true,
     "config_db_url": "postgresql:///?service=qwc_configdb",
-    "default_qgis_server_url": "http://qgis-server/ows/",
+    "default_qgis_server_url": "http://qgis-server:80/ows/",
     "generate_nested_nrel_forms": false,
     "generate_wfs_services": true,
     "permissions_default_allow": true,
@@ -13,7 +13,8 @@
     "qgis_projects_scan_base_dir": "/data",
     "strip_scan_prefix_from_theme_names": false,
     "tenant": "default",
-    "validate_schema": true,
+    "ignore_errors": true,
+    "validate_schema": false,
     "use_default_map_thumbnail": true
   },
   "themesConfig": "./themesConfig.json",
@@ -42,33 +43,39 @@
         "permalink_service_url": "/api/v1/permalink/",
         "print_service_url": "/api/v1/print/",
         "qwc2_path": "/qwc2"
+      },
+      "generator_config": {
+        "qwc2_config": {
+          "qwc2_config_file": "/srv/qwc_service/config.json",
+          "qwc2_index_file": "/srv/qwc_service/config-in/default/index.html"
+        }
       }
     },
     {
-      "name": "ogcService",
+      "name": "ogc",
       "config": {
         "default_ogc_service_url": "http://qgis-server/ows/"
       }
     },
     {
-      "name": "dataService",
+      "name": "data",
       "config": {
         "db_url": "postgresql:///?service=qwc_configdb",
         "geometry_default_allow_null": false
       }
     },
     {
-      "name": "featureInfoService",
+      "name": "featureInfo",
       "config": {
         "default_qgis_server_url": "http://qgis-server/ows/"
       }
     },
     {
-      "name": "printService",
+      "name": "print",
       "config": {}
     },
     {
-      "name": "permalinkService",
+      "name": "permalink",
       "config": {
         "db_url": "postgresql:///?service=qwc_configdb"
       }
