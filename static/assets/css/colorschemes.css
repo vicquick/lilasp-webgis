@@ -1,117 +1,121 @@
 :root.highcontrast {
-    --text-color: oklch(5% 0 0);
-    --text-color-link: oklch(30% 0.18 250);
+    /* Base colors */
+    --text-color: black;
+    --text-color-link: blue;
     --text-color-disabled: #999;
-    --container-bg-color: #fff;
-    --input-bg-color: #fff;
-    --input-bg-color-disabled: #fff;
-    --border-color: oklch(5% 0 0);
-    --color-active: oklch(30% 0.18 250);
-    --focus-outline: 3px solid oklch(5% 0 0);
-    --tooltip-bg-color: rgba(0, 0, 0, 0.85);
-    --tooltip-text-color: #fff;
-    --tooltip-border-color: #000;
-    --map-button-bg-color: #000;
-    --map-button-text-color: #fff;
-    --map-button-hover-bg-color: #fff;
-    --map-button-hover-text-color: #000;
-    --map-button-active-bg-color: #fff;
-    --map-button-active-text-color: #000;
-    --panel-bg-color: rgba(255, 255, 255, 0.92);
-    --panel-text-color: #000;
-    --titlebar-bg-color: #000;
-    --titlebar-text-color: #fff;
-    --button-bg-color: #fff;
+    --container-bg-color: white;
+    --input-bg-color: white;
+    --input-bg-color-disabled: white;
+    --border-color: black;
+    --color-active: blue;
+    --focus-outline: 2px solid black;
+    /* Tooltips */
+    --tooltip-bg-color: rgba(0, 0, 0, 0.75);
+    --tooltip-text-color: white;
+    --tooltip-border-color: black;
+    /* Map buttons */
+    --map-button-bg-color: black;
+    --map-button-text-color: white;
+    --map-button-hover-bg-color: white;
+    --map-button-hover-text-color: black;
+    --map-button-active-bg-color: white;
+    --map-button-active-text-color: black;
+    /* Panels (topbar and bottom bar) */
+    --panel-bg-color: rgba(255, 255, 255, 0.85);
+    --panel-text-color: black;
+    /* Titlebars */
+    --titlebar-bg-color: black;
+    --titlebar-text-color: white;
+    /* Button */
+    --button-bg-color: white;
     --button-bg-color-hover: #ddd;
-    --button-bg-color-active: #000;
+    --button-bg-color-active: black;
     --button-bg-color-active-hover: #222;
-    --button-bg-color-disabled: #fff;
-    --button-text-color: #000;
-    --button-text-color-hover: #000;
-    --button-text-color-active: #fff;
-    --button-text-color-active-hover: #fff;
+    --button-bg-color-disabled: white;
+    --button-text-color: black;
+    --button-text-color-hover: black;
+    --button-text-color-active: white;
+    --button-text-color-active-hover: white;
     --button-text-color-disabled: #999;
-    --list-bg-color: #fff;
-    --list-section-bg-color: #000;
-    --list-section-text-color: #fff;
+    /* List */
+    --list-bg-color: white;
+    --list-section-bg-color: black;
+    --list-section-text-color: white;
     --list-item-bg-color-even: #eee;
     --list-item-bg-color-hover: #ddd;
-    --list-item-bg-color-active: #000;
-    --list-item-bg-color-active-hover: #222;
-    --list-item-text-color-hover: #000;
-    --list-item-text-color-active: #fff;
-    --list-item-text-color-active-hover: #fff;
-    --app-menu-bg-color: #fff;
-    --app-menu-text-color: #000;
+    --list-item-bg-color-active: #aaa;
+    --list-item-bg-color-active-hover: #bbb;
+    --list-item-text-color-hover: black;
+    --list-item-text-color-active: black;
+    --list-item-text-color-active-hover: black;
+    /* App menu */
+    --app-menu-bg-color: white;
+    --app-menu-text-color: black;
     --app-menu-bg-color-hover: #ddd;
-    --app-menu-text-color-hover: #000;
-    --app-submenu-bg-color: #000;
-    --app-submenu-text-color: #fff;
+    --app-menu-text-color-hover: black;
+    --app-submenu-bg-color: black;
+    --app-submenu-text-color: white;
     --app-submenu-bg-color-hover: #222;
-    --app-submenu-text-color-hover: #fff;
+    --app-submenu-text-color-hover: white;
 }
 
 :root.dark {
-    /* Forest-tinted dark — matches LILASp brand in dark mode */
-    --text-color: oklch(92% 0.02 152);
-    --text-color-link: oklch(72% 0.10 152);
-    --text-color-disabled: oklch(50% 0.03 152);
-    --container-bg-color: oklch(22% 0.04 152);
-    --input-bg-color: oklch(24% 0.04 152);
-    --input-bg-color-disabled: oklch(19% 0.03 152);
-    --border-color: oklch(30% 0.04 152);
-    --color-active: oklch(68% 0.12 152);
-    --focus-outline: 2px solid oklch(60% 0.12 152);
-    --tooltip-bg-color: oklch(12% 0.03 152);
-    --tooltip-text-color: oklch(92% 0.02 152);
-    --tooltip-border-color: oklch(30% 0.05 152);
-    --map-button-bg-color: oklch(24% 0.04 152);
-    --map-button-text-color: oklch(72% 0.10 152);
-    --map-button-hover-bg-color: oklch(38% 0.12 152);
-    --map-button-hover-text-color: oklch(96% 0.02 152);
-    --map-button-active-bg-color: oklch(73% 0.15 68);
-    --map-button-active-text-color: oklch(15% 0.03 152);
-    --panel-bg-color: oklch(20% 0.04 152 / 0.88);
-    --panel-text-color: oklch(90% 0.02 152);
-    --titlebar-bg-color: oklch(28% 0.07 152);
-    --titlebar-text-color: oklch(94% 0.02 152);
-    --button-bg-color: oklch(26% 0.04 152);
-    --button-bg-color-hover: oklch(29% 0.04 152);
-    --button-bg-color-active: oklch(38% 0.12 152);
-    --button-bg-color-active-hover: oklch(32% 0.11 152);
-    --button-bg-color-disabled: oklch(21% 0.03 152);
-    --button-text-color: oklch(88% 0.03 152);
-    --button-text-color-hover: oklch(94% 0.02 152);
-    --button-text-color-active: oklch(96% 0.02 152);
+    /* Base */
+    --text-color: #e6edf3;
+    --text-color-link: #7bb8c4;
+    --text-color-disabled: #6b7280;
+    --container-bg-color: #161b22;
+    --input-bg-color: #21262d;
+    --input-bg-color-disabled: #0d1117;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --color-active: #5e9aa8;
+    --focus-outline: 2px solid #5e9aa8;
+    /* Tooltips */
+    --tooltip-bg-color: rgba(13, 17, 23, 0.92);
+    --tooltip-text-color: #e6edf3;
+    --tooltip-border-color: #045863;
+    /* Map buttons */
+    --map-button-bg-color: #21262d;
+    --map-button-text-color: #7bb8c4;
+    --map-button-hover-bg-color: #0a8394;
+    --map-button-hover-text-color: #fff;
+    --map-button-active-bg-color: #ffb300;
+    --map-button-active-text-color: #0d1117;
+    /* Panels (topbar and bottom bar) */
+    --panel-bg-color: rgba(22, 27, 34, 0.90);
+    --panel-text-color: #e6edf3;
+    /* Titlebars */
+    --titlebar-bg-color: #045863;
+    --titlebar-text-color: #fff;
+    /* Button */
+    --button-bg-color: #21262d;
+    --button-bg-color-hover: #2d333b;
+    --button-bg-color-active: #0a8394;
+    --button-bg-color-active-hover: #066d7a;
+    --button-bg-color-disabled: #161b22;
+    --button-text-color: #e6edf3;
+    --button-text-color-hover: #fff;
+    --button-text-color-active: #fff;
     --button-text-color-active-hover: #fff;
-    --button-text-color-disabled: oklch(45% 0.03 152);
-    --list-bg-color: oklch(24% 0.04 152);
-    --list-section-bg-color: oklch(15% 0.05 152);
-    --list-section-text-color: oklch(88% 0.03 152);
-    --list-item-bg-color-even: oklch(22% 0.04 152);
-    --list-item-bg-color-hover: oklch(28% 0.05 152);
-    --list-item-bg-color-active: oklch(35% 0.10 152);
-    --list-item-bg-color-active-hover: oklch(30% 0.10 152);
-    --list-item-text-color-hover: oklch(94% 0.02 152);
-    --list-item-text-color-active: oklch(96% 0.02 152);
+    --button-text-color-disabled: #6b7280;
+    /* List */
+    --list-bg-color: #21262d;
+    --list-section-bg-color: #0d1117;
+    --list-section-text-color: #e6edf3;
+    --list-item-bg-color-even: #1c2128;
+    --list-item-bg-color-hover: rgba(94, 154, 168, 0.15);
+    --list-item-bg-color-active: #045863;
+    --list-item-bg-color-active-hover: #066d7a;
+    --list-item-text-color-hover: #e6edf3;
+    --list-item-text-color-active: #fff;
     --list-item-text-color-active-hover: #fff;
-    --app-menu-bg-color: oklch(25% 0.04 152);
-    --app-menu-text-color: oklch(88% 0.03 152);
-    --app-menu-bg-color-hover: oklch(30% 0.06 152);
-    --app-menu-text-color-hover: oklch(72% 0.10 152);
-    --app-submenu-bg-color: oklch(18% 0.04 152);
-    --app-submenu-text-color: oklch(88% 0.03 152);
-    --app-submenu-bg-color-hover: oklch(30% 0.08 152);
-    --app-submenu-text-color-hover: oklch(96% 0.02 152);
-}
-
-/* Dark mode TopBar */
-:root.dark .TopBar {
-    background: oklch(22% 0.06 152);
-    border-bottom-color: oklch(16% 0.05 152);
-}
-
-:root.dark .BottomBar {
-    background: oklch(20% 0.04 152 / 0.90);
-    border-top-color: oklch(28% 0.04 152);
+    /* App menu */
+    --app-menu-bg-color: #21262d;
+    --app-menu-text-color: #e6edf3;
+    --app-menu-bg-color-hover: rgba(94, 154, 168, 0.18);
+    --app-menu-text-color-hover: #7bb8c4;
+    --app-submenu-bg-color: #0d1117;
+    --app-submenu-text-color: #e6edf3;
+    --app-submenu-bg-color-hover: #045863;
+    --app-submenu-text-color-hover: #fff;
 }

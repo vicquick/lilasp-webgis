@@ -1,734 +1,500 @@
-/* LILASp WebGIS Theme
- * Landschaftsplanung · Infrastruktur · Liegenschaften · Anlagen · Spielplätze
- * Municipal GIS Platform — Professional Theme
- */
+/* LILASp WebGIS — BIM Teal Theme */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 
-/* ─── Font Import ─────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,400&display=swap');
-
-/* ─── Design Tokens ───────────────────────────────────────── */
+/* ─── Brand palette (BIM teal) ─────────────────────────────────── */
 :root {
-  /* Brand greens (OKLCH — perceptually uniform) */
-  --ls-green-950: oklch(20% 0.07 152);
-  --ls-green-800: oklch(30% 0.11 152);
-  --ls-green-700: oklch(38% 0.12 152);   /* primary brand #2d6a4f */
-  --ls-green-600: oklch(48% 0.13 152);
-  --ls-green-500: oklch(58% 0.13 152);
-  --ls-green-300: oklch(75% 0.09 152);
-  --ls-green-100: oklch(93% 0.04 152);
-  --ls-green-50:  oklch(97% 0.02 152);
+  --ls-teal-950: #02373d;
+  --ls-teal-900: #03494f;
+  --ls-teal-800: #045863;
+  --ls-teal-700: #066d7a;
+  --ls-teal-600: #0a8394;
+  --ls-teal-500: #3a8a96;
+  --ls-teal-400: #5e9aa8;
+  --ls-teal-300: #7bb8c4;
+  --ls-teal-200: #a8d4dc;
+  --ls-teal-100: #d0ecf0;
+  --ls-teal-50:  #e8f4f6;
 
-  /* Amber accent */
-  --ls-amber-600: oklch(64% 0.14 68);
-  --ls-amber-500: oklch(73% 0.15 68);
-  --ls-amber-400: oklch(82% 0.13 68);
-  --ls-amber-100: oklch(95% 0.05 68);
+  --ls-gold-700: #cc8400;
+  --ls-gold-600: #e09200;
+  --ls-gold-500: #ffb300;
+  --ls-gold-400: #ffc940;
 
-  /* Neutrals (green-tinted) */
-  --ls-ink:       oklch(18% 0.03 152);
-  --ls-ink-500:   oklch(45% 0.04 152);
-  --ls-ink-400:   oklch(55% 0.04 152);
-  --ls-ink-200:   oklch(78% 0.03 152);
-  --ls-ink-100:   oklch(88% 0.02 152);
-  --ls-ink-50:    oklch(96% 0.01 152);
+  --ls-ink:      #0d1117;
+  --ls-ink-700:  #1c2128;
+  --ls-ink-600:  #21262d;
+  --ls-ink-500:  #4a5568;
+  --ls-ink-400:  #6b7280;
+  --ls-ink-300:  #9ca3af;
+  --ls-ink-200:  #d1d5db;
+  --ls-ink-100:  #e9ecef;
+  --ls-ink-50:   #f6f8f8;
+  --ls-surface:  #fafcfc;
 
-  /* Surfaces */
-  --ls-surface:        oklch(99% 0.01 152);
-  --ls-surface-raised: oklch(97% 0.02 152);
-  --ls-border:         oklch(88% 0.03 152);
-  --ls-border-strong:  oklch(74% 0.05 152);
+  --ls-border:        rgba(4, 88, 99, 0.10);
+  --ls-border-strong: rgba(4, 88, 99, 0.20);
+  --ls-shadow-sm: 0 1px 3px rgba(4, 88, 99, 0.12);
+  --ls-shadow-md: 0 4px 12px rgba(4, 88, 99, 0.14);
+  --ls-shadow-lg: 0 8px 28px rgba(4, 88, 99, 0.18);
 
-  /* Shadows */
-  --ls-shadow-sm: 0 1px 3px oklch(18% 0.05 152 / 0.12);
-  --ls-shadow-md: 0 4px 12px oklch(18% 0.05 152 / 0.15);
-  --ls-shadow-lg: 0 8px 28px oklch(18% 0.05 152 / 0.20);
-
-  /* Typography */
-  --ls-font-brand: 'Outfit', system-ui, sans-serif;
-  --ls-font-body:  'Source Sans 3', system-ui, sans-serif;
-
-  /* Radii */
+  --ls-font:      'DM Sans', system-ui, -apple-system, sans-serif;
   --ls-radius:    4px;
-  --ls-radius-md: 7px;
-  --ls-radius-lg: 12px;
+  --ls-radius-md: 6px;
+  --ls-radius-lg: 10px;
+
+  /* ─── QWC2 CSS variables ────────────────────────────────────── */
+  --text-color:              var(--ls-ink);
+  --text-color-link:         var(--ls-teal-700);
+  --text-color-disabled:     var(--ls-ink-300);
+  --container-bg-color:      var(--ls-surface);
+  --input-bg-color:          #fff;
+  --input-bg-color-disabled: var(--ls-ink-50);
+  --border-color:            var(--ls-border);
+  --color-active:            var(--ls-teal-800);
+  --focus-outline:           2px solid var(--ls-teal-500);
+
+  --tooltip-bg-color:        var(--ls-ink-700);
+  --tooltip-text-color:      #fff;
+  --tooltip-border-color:    var(--ls-teal-800);
+
+  --map-button-bg-color:          #fff;
+  --map-button-text-color:        var(--ls-teal-800);
+  --map-button-hover-bg-color:    var(--ls-teal-800);
+  --map-button-hover-text-color:  #fff;
+  --map-button-active-bg-color:   var(--ls-gold-500);
+  --map-button-active-text-color: var(--ls-ink);
+
+  --panel-bg-color:   rgba(250, 252, 252, 0.94);
+  --panel-text-color: var(--ls-ink);
+
+  --titlebar-bg-color:   var(--ls-teal-800);
+  --titlebar-text-color: #fff;
+
+  --button-bg-color:              #fff;
+  --button-bg-color-hover:        var(--ls-teal-50);
+  --button-bg-color-active:       var(--ls-teal-800);
+  --button-bg-color-active-hover: var(--ls-teal-700);
+  --button-bg-color-disabled:     var(--ls-ink-50);
+  --button-text-color:            var(--ls-ink);
+  --button-text-color-hover:      var(--ls-teal-800);
+  --button-text-color-active:     #fff;
+  --button-text-color-active-hover: #fff;
+  --button-text-color-disabled:   var(--ls-ink-300);
+
+  --list-bg-color:                     #fff;
+  --list-section-bg-color:             var(--ls-teal-800);
+  --list-section-text-color:           #fff;
+  --list-item-bg-color-even:           var(--ls-teal-50);
+  --list-item-bg-color-hover:          var(--ls-teal-100);
+  --list-item-bg-color-active:         var(--ls-teal-800);
+  --list-item-bg-color-active-hover:   var(--ls-teal-700);
+  --list-item-text-color-hover:        var(--ls-ink);
+  --list-item-text-color-active:       #fff;
+  --list-item-text-color-active-hover: #fff;
+
+  --app-menu-bg-color:           #fff;
+  --app-menu-text-color:         var(--ls-ink);
+  --app-menu-bg-color-hover:     var(--ls-teal-50);
+  --app-menu-text-color-hover:   var(--ls-teal-800);
+  --app-submenu-bg-color:        var(--ls-teal-800);
+  --app-submenu-text-color:      #fff;
+  --app-submenu-bg-color-hover:  var(--ls-teal-700);
+  --app-submenu-text-color-hover: #fff;
 }
 
-/* ─── Base ────────────────────────────────────────────────── */
+/* ─── Base ──────────────────────────────────────────────────────── */
 body, #container {
-  font-family: var(--ls-font-body);
+  font-family: var(--ls-font);
   font-size: 14px;
   line-height: 1.5;
   color: var(--ls-ink);
 }
 
-/* ─── QWC2 CSS Variables (light default) ─────────────────── */
-:root {
-  --text-color:              var(--ls-ink);
-  --text-color-link:         var(--ls-green-600);
-  --text-color-disabled:     var(--ls-ink-400);
-  --container-bg-color:      var(--ls-surface);
-  --input-bg-color:          var(--ls-surface);
-  --input-bg-color-disabled: var(--ls-ink-50);
-  --border-color:            var(--ls-border);
-  --color-active:            var(--ls-green-700);
-  --focus-outline:           2px solid var(--ls-green-500);
-
-  --tooltip-bg-color:    var(--ls-ink);
-  --tooltip-text-color:  var(--ls-green-50);
-  --tooltip-border-color: var(--ls-green-700);
-
-  --map-button-bg-color:          var(--ls-surface);
-  --map-button-text-color:        var(--ls-green-700);
-  --map-button-hover-bg-color:    var(--ls-green-700);
-  --map-button-hover-text-color:  var(--ls-surface);
-  --map-button-active-bg-color:   var(--ls-amber-500);
-  --map-button-active-text-color: var(--ls-ink);
-
-  --panel-bg-color:   color-mix(in oklch, var(--ls-surface) 92%, transparent);
-  --panel-text-color: var(--ls-ink);
-
-  --titlebar-bg-color:  var(--ls-green-700);
-  --titlebar-text-color: var(--ls-surface);
-
-  --button-bg-color:              var(--ls-surface);
-  --button-bg-color-hover:        var(--ls-green-50);
-  --button-bg-color-active:       var(--ls-green-700);
-  --button-bg-color-active-hover: var(--ls-green-800);
-  --button-bg-color-disabled:     var(--ls-ink-50);
-  --button-text-color:              var(--ls-ink);
-  --button-text-color-hover:        var(--ls-ink);
-  --button-text-color-active:       var(--ls-surface);
-  --button-text-color-active-hover: var(--ls-surface);
-  --button-text-color-disabled:     var(--ls-ink-400);
-
-  --list-bg-color:                    var(--ls-surface);
-  --list-section-bg-color:            var(--ls-green-700);
-  --list-section-text-color:          var(--ls-surface);
-  --list-item-bg-color-even:          var(--ls-green-50);
-  --list-item-bg-color-hover:         var(--ls-green-100);
-  --list-item-bg-color-active:        var(--ls-green-700);
-  --list-item-bg-color-active-hover:  var(--ls-green-800);
-  --list-item-text-color-hover:        var(--ls-ink);
-  --list-item-text-color-active:       var(--ls-surface);
-  --list-item-text-color-active-hover: var(--ls-surface);
-
-  --app-menu-bg-color:         var(--ls-surface);
-  --app-menu-text-color:       var(--ls-ink);
-  --app-menu-bg-color-hover:   var(--ls-green-100);
-  --app-menu-text-color-hover: var(--ls-green-700);
-  --app-submenu-bg-color:         var(--ls-green-800);
-  --app-submenu-text-color:       var(--ls-surface);
-  --app-submenu-bg-color-hover:   var(--ls-green-700);
-  --app-submenu-text-color-hover: var(--ls-surface);
-}
-
-/* ─── TopBar ──────────────────────────────────────────────── */
+/* ─── TopBar ────────────────────────────────────────────────────── */
 .TopBar {
-  background: var(--ls-green-700);
-  border-bottom: 2px solid var(--ls-green-800);
-  box-shadow: 0 2px 8px oklch(18% 0.08 152 / 0.28);
-  font-family: var(--ls-font-brand);
+  background: var(--ls-teal-800) !important;
+  border-bottom: 1px solid var(--ls-teal-900) !important;
+  box-shadow: 0 2px 8px rgba(4, 88, 99, 0.30) !important;
+  font-family: var(--ls-font);
 }
 
+/* QWC2 logo — invert to white on dark teal bg */
+.TopBar img.logo-img,
 .TopBar .logo-img {
-  filter: brightness(0) invert(1);
-  opacity: 0.92;
+  filter: brightness(0) invert(1) !important;
+  opacity: 0.90;
+  height: 30px !important;
+  width: auto !important;
 }
 
-.TopBar .apptitle {
-  font-family: var(--ls-font-brand);
-  font-weight: 600;
+/* Logo container — flex so LILASp wordmark sits right of logo */
+.TopBar .logo,
+.TopBar .topbar-logo,
+.TopBar .portal-logo {
+  display: flex !important;
+  align-items: center;
+  gap: 0;
+  cursor: pointer;
+}
+
+/* LILASp wordmark injected after the QWC2 logo */
+.TopBar .logo::after,
+.TopBar .topbar-logo::after,
+.TopBar .portal-logo::after {
+  content: 'LILASp';
+  font-family: var(--ls-font);
+  font-weight: 700;
   font-size: 16px;
-  letter-spacing: 0.01em;
-  color: var(--ls-green-50);
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.92);
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+  white-space: nowrap;
+  line-height: 1;
+  display: block;
 }
 
+/* TopBar icons and toolbar items */
 .TopBar button,
-.TopBar .toolbar-item {
-  color: oklch(93% 0.03 152);
-  border-radius: var(--ls-radius);
-  transition: background 0.14s ease, color 0.14s ease;
+.TopBar .toolbar-item,
+.TopBar .task-bar-button {
+  color: rgba(255, 255, 255, 0.85) !important;
+  border-radius: var(--ls-radius) !important;
+  transition: background 0.12s ease, color 0.12s ease;
 }
-
 .TopBar button:hover,
-.TopBar .toolbar-item:hover {
-  background: oklch(100% 0 0 / 0.13);
-  color: #fff;
-}
-
-.TopBar button.active,
-.TopBar .toolbar-item.active {
-  background: var(--ls-amber-500);
-  color: var(--ls-ink);
-}
-
-.TopBar .SearchBox input,
-.TopBar input[type="text"] {
-  background: oklch(100% 0 0 / 0.13);
-  border: 1px solid oklch(100% 0 0 / 0.22);
-  border-radius: var(--ls-radius-md);
-  color: #fff;
-  font-family: var(--ls-font-body);
-}
-
-.TopBar .SearchBox input::placeholder {
-  color: oklch(90% 0.02 152 / 0.65);
-}
-
-.TopBar .SearchBox input:focus {
-  background: oklch(100% 0 0 / 0.20);
-  border-color: oklch(100% 0 0 / 0.42);
-  outline: none;
-  box-shadow: none;
-}
-
-/* ─── BottomBar ───────────────────────────────────────────── */
-.BottomBar {
-  background: color-mix(in oklch, var(--ls-surface) 94%, transparent);
-  border-top: 1px solid var(--ls-border);
-  font-family: var(--ls-font-body);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  color: var(--ls-ink-500);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.BottomBar a {
-  color: var(--ls-green-600);
-  text-decoration: none;
-}
-
-/* ─── Map Buttons ─────────────────────────────────────────── */
-.ButtonBar .map-button,
-.map-button {
-  background: var(--ls-surface);
-  border: 1px solid var(--ls-border) !important;
-  box-shadow: var(--ls-shadow-sm);
-  color: var(--ls-green-700);
-  border-radius: var(--ls-radius-md) !important;
-  transition: all 0.14s ease;
-}
-
-.ButtonBar .map-button:hover,
-.map-button:hover {
-  background: var(--ls-green-700);
-  border-color: var(--ls-green-700) !important;
-  color: var(--ls-surface);
-  box-shadow: var(--ls-shadow-md);
-  transform: translateY(-1px);
-}
-
-.ButtonBar .map-button.active,
-.map-button.active {
-  background: var(--ls-amber-500);
-  border-color: var(--ls-amber-600) !important;
-  color: var(--ls-ink);
-}
-
-/* ─── ResizableWindow (dialogs) ───────────────────────────── */
-.ResizableWindow {
-  background: var(--ls-surface);
-  border: 1px solid var(--ls-border);
-  border-radius: var(--ls-radius-lg);
-  box-shadow: var(--ls-shadow-lg);
-  font-family: var(--ls-font-body);
-  overflow: hidden;
-}
-
-.ResizableWindow .resizeable-window-title,
-.resizeable-window-title {
-  background: var(--ls-green-700);
-  color: var(--ls-surface);
-  font-family: var(--ls-font-brand);
-  font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.025em;
-  padding: 8px 12px;
-}
-
-.ResizableWindow .resizeable-window-title button,
-.ResizableWindow .resizeable-window-title .icon {
-  color: var(--ls-green-100) !important;
-  opacity: 0.82;
-  transition: opacity 0.12s;
-}
-
-.ResizableWindow .resizeable-window-title button:hover {
-  opacity: 1;
+.TopBar .toolbar-item:hover,
+.TopBar .task-bar-button:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
   color: #fff !important;
 }
-
-/* ─── SideBar ─────────────────────────────────────────────── */
-.SideBar {
-  background: var(--ls-surface);
-  border-inline: 1px solid var(--ls-border);
-  box-shadow: var(--ls-shadow-sm);
-  font-family: var(--ls-font-body);
+.TopBar button.active,
+.TopBar .toolbar-item.active,
+.TopBar .task-bar-button.active {
+  background: var(--ls-gold-500) !important;
+  color: var(--ls-ink) !important;
 }
 
-.SideBar .SideBarTitle,
-.SideBar > .sidebar-body > .header,
-.SideBar > header {
-  background: var(--ls-surface-raised);
-  border-bottom: 2px solid var(--ls-green-700);
-  color: var(--ls-green-700);
-  font-family: var(--ls-font-brand);
-  font-weight: 600;
-  font-size: 12px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  padding: 10px 14px;
+/* Search box */
+.TopBar .SearchBox input,
+.TopBar .searchbox input,
+.TopBar input[type="text"] {
+  background: rgba(255, 255, 255, 0.13) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: var(--ls-radius-md) !important;
+  color: #fff !important;
+  font-family: var(--ls-font);
+  transition: all 0.12s ease;
+}
+.TopBar .SearchBox input::placeholder,
+.TopBar input[type="text"]::placeholder {
+  color: rgba(255, 255, 255, 0.50);
+}
+.TopBar .SearchBox input:focus,
+.TopBar input[type="text"]:focus {
+  background: rgba(255, 255, 255, 0.20) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
-/* Task buttons (sidebar icon buttons) */
-.TaskButton,
-.task-button {
-  background: var(--ls-surface);
-  border: 1px solid var(--ls-border) !important;
-  color: var(--ls-green-700);
+/* Search results dropdown */
+.SearchBox .searchbar-results,
+.searchbox-results {
+  background: #fff;
+  border: 1px solid var(--ls-border-strong);
   border-radius: var(--ls-radius-md);
-  box-shadow: var(--ls-shadow-sm);
-  transition: all 0.14s ease;
-}
-
-.TaskButton:hover,
-.task-button:hover {
-  background: var(--ls-green-100);
-  border-color: var(--ls-green-300) !important;
-}
-
-.TaskButton.active,
-.task-button.active {
-  background: var(--ls-green-700);
-  border-color: var(--ls-green-700) !important;
-  color: var(--ls-surface);
-  box-shadow: var(--ls-shadow-md);
-}
-
-/* ─── LayerTree ───────────────────────────────────────────── */
-.LayerTree {
-  font-family: var(--ls-font-body);
-  font-size: 13px;
-}
-
-.LayerTree .layertree-item {
-  border-bottom: 1px solid var(--ls-border);
-  transition: background 0.1s;
-}
-
-.LayerTree .layertree-item:hover {
-  background: var(--ls-green-50);
-}
-
-.LayerTree .layertree-group-title {
-  font-weight: 600;
-  color: var(--ls-green-700);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.LayerTree input[type="checkbox"],
-.LayerTree input[type="radio"] {
-  accent-color: var(--ls-green-700);
-}
-
-/* ─── FeatureForm / Editing ───────────────────────────────── */
-.FeatureForm,
-.Editing {
-  font-family: var(--ls-font-body);
-  font-size: 13px;
-}
-
-.FeatureForm label,
-.Editing label {
-  color: var(--ls-ink-500);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  display: block;
-  margin-bottom: 3px;
-}
-
-.FeatureForm input,
-.FeatureForm select,
-.FeatureForm textarea,
-.Editing input,
-.Editing select,
-.Editing textarea {
-  border: 1px solid var(--ls-border);
-  border-radius: var(--ls-radius);
-  background: var(--ls-surface);
-  color: var(--ls-ink);
-  font-family: var(--ls-font-body);
-  font-size: 13px;
-  padding: 6px 9px;
-  transition: border-color 0.14s, box-shadow 0.14s;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.FeatureForm input:focus,
-.FeatureForm select:focus,
-.FeatureForm textarea:focus,
-.Editing input:focus,
-.Editing select:focus,
-.Editing textarea:focus {
-  border-color: var(--ls-green-600);
-  box-shadow: 0 0 0 3px oklch(48% 0.13 152 / 0.15);
-  outline: none;
-}
-
-/* ─── Identify Results ────────────────────────────────────── */
-.IdentifyViewer {
-  font-family: var(--ls-font-body);
-  font-size: 13px;
-}
-
-.IdentifyViewer .identify-layer-title {
-  background: var(--ls-green-700);
-  color: var(--ls-surface);
-  font-family: var(--ls-font-brand);
-  font-weight: 500;
-  font-size: 12px;
-  letter-spacing: 0.03em;
-  padding: 5px 10px;
-}
-
-.IdentifyViewer .identify-attr-row {
-  border-bottom: 1px solid var(--ls-border);
-  padding: 4px 8px;
-  transition: background 0.1s;
-}
-
-.IdentifyViewer .identify-attr-row:hover {
-  background: var(--ls-green-50);
-}
-
-.IdentifyViewer .identify-attr-name {
-  color: var(--ls-ink-500);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-/* ─── App Menu ────────────────────────────────────────────── */
-.AppMenu {
-  font-family: var(--ls-font-brand);
-  background: var(--ls-surface);
-  border: 1px solid var(--ls-border);
-  border-radius: var(--ls-radius-lg);
   box-shadow: var(--ls-shadow-lg);
-  overflow: hidden;
+}
+.SearchBox .searchbar-result:hover,
+.searchbox-results li:hover {
+  background: var(--ls-teal-50);
+  color: var(--ls-teal-800);
 }
 
-.AppMenu .appmenu-title {
-  background: var(--ls-surface-raised);
-  border-bottom: 1px solid var(--ls-border);
-  color: var(--ls-ink-500);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 8px 14px;
-}
-
-.AppMenu .appmenu-entry {
-  padding: 9px 14px;
-  border-bottom: 1px solid var(--ls-border);
-  transition: background 0.1s;
-  font-size: 14px;
-  color: var(--ls-ink);
-}
-
-.AppMenu .appmenu-entry:hover {
-  background: var(--ls-green-100);
-  color: var(--ls-green-700);
-}
-
-.AppMenu .appmenu-entry.active {
-  background: var(--ls-green-700);
-  color: var(--ls-surface);
-}
-
-/* ─── Portal / Theme Switcher ─────────────────────────────── */
-.Portal {
-  font-family: var(--ls-font-brand);
-}
-
-.Portal .portalitem {
-  background: var(--ls-surface);
-  border: 1px solid var(--ls-border);
-  border-radius: var(--ls-radius-lg);
-  box-shadow: var(--ls-shadow-sm);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
-  overflow: hidden;
-}
-
-.Portal .portalitem:hover {
-  border-color: var(--ls-green-500);
-  box-shadow: var(--ls-shadow-md);
-  transform: translateY(-2px);
-}
-
-.Portal .portalitem-title {
-  background: var(--ls-surface-raised);
-  border-top: 1px solid var(--ls-border);
-  color: var(--ls-ink);
-  font-weight: 500;
-  font-size: 13px;
-  padding: 8px 12px;
-}
-
-/* ─── Authentication / Login Dialog ──────────────────────── */
-
-/* Full-screen backdrop */
-.login-required-overlay {
-  background: oklch(18% 0.07 152 / 0.68);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-}
-
-/* The card */
-.Authentication,
-.Authentication .login-dialog,
-.Login {
-  background: var(--ls-surface) !important;
-  border-radius: var(--ls-radius-lg) !important;
-  box-shadow: 0 20px 60px oklch(18% 0.08 152 / 0.40) !important;
-  border: none !important;
-  overflow: hidden;
-  font-family: var(--ls-font-body);
-  min-width: 340px;
-}
-
-/* Login card header — topographic contour texture */
-.Authentication .login-header,
-.Login .login-header,
-.Authentication form > *:first-child {
-  background:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 22px,
-      oklch(100% 0 0 / 0.045) 22px,
-      oklch(100% 0 0 / 0.045) 23px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 44px,
-      oklch(100% 0 0 / 0.02) 44px,
-      oklch(100% 0 0 / 0.02) 45px
-    ),
-    linear-gradient(140deg, var(--ls-green-700) 0%, var(--ls-green-800) 100%);
-  padding: 32px 32px 24px;
-}
-
-/* Brand mark at top of login */
-.Authentication .login-title,
-.Login .login-title,
-.Authentication h2,
-.Login h2 {
-  font-family: var(--ls-font-brand) !important;
-  font-weight: 700;
-  font-size: 24px;
-  color: var(--ls-surface) !important;
-  letter-spacing: -0.01em;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.Authentication .login-subtitle,
-.Login .login-subtitle {
-  font-size: 13px;
-  color: oklch(90% 0.04 152);
-  margin-top: 5px;
-  font-family: var(--ls-font-body);
-}
-
-/* Form body */
-.Authentication .login-form,
-.Login form,
-.Login .login-form {
-  padding: 24px 32px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-/* Labels inside login */
-.Authentication label,
-.Login label {
-  font-family: var(--ls-font-brand);
-  font-weight: 600;
+/* ─── BottomBar ─────────────────────────────────────────────────── */
+.BottomBar {
+  background: rgba(250, 252, 252, 0.94) !important;
+  border-top: 1px solid var(--ls-border) !important;
+  backdrop-filter: blur(8px);
+  font-family: var(--ls-font);
   font-size: 11.5px;
-  color: var(--ls-ink-500);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  display: block;
-  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ls-ink-400);
+}
+.BottomBar a {
+  color: var(--ls-teal-600);
+  text-decoration: none;
+}
+.BottomBar a:hover {
+  color: var(--ls-teal-800);
 }
 
-/* Inputs inside login */
-.Authentication input[type="text"],
-.Authentication input[type="password"],
-.Login input[type="text"],
-.Login input[type="password"] {
-  width: 100%;
-  border: 1.5px solid var(--ls-border-strong);
-  border-radius: var(--ls-radius-md);
-  background: var(--ls-surface-raised);
-  color: var(--ls-ink);
-  font-family: var(--ls-font-body);
-  font-size: 14px;
-  padding: 10px 12px;
-  transition: border-color 0.14s, box-shadow 0.14s;
-  box-sizing: border-box;
+/* ─── Map buttons ───────────────────────────────────────────────── */
+.ButtonBar .map-button,
+.map-button {
+  background: #fff !important;
+  border: 1px solid var(--ls-border) !important;
+  box-shadow: var(--ls-shadow-sm) !important;
+  color: var(--ls-teal-800) !important;
+  border-radius: var(--ls-radius-md) !important;
+  transition: all 0.12s ease;
 }
-
-.Authentication input[type="text"]:focus,
-.Authentication input[type="password"]:focus,
-.Login input[type="text"]:focus,
-.Login input[type="password"]:focus {
-  border-color: var(--ls-green-600);
-  box-shadow: 0 0 0 3px oklch(48% 0.13 152 / 0.18);
-  outline: none;
-  background: var(--ls-surface);
-}
-
-/* Submit button */
-.Authentication button[type="submit"],
-.Authentication .login-button,
-.Login button[type="submit"],
-.Login .login-button {
-  width: 100%;
-  background: var(--ls-green-700);
-  color: var(--ls-surface);
-  border: none;
-  border-radius: var(--ls-radius-md);
-  font-family: var(--ls-font-brand);
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 0.02em;
-  padding: 11px;
-  cursor: pointer;
-  transition: background 0.14s, box-shadow 0.14s, transform 0.1s;
-  margin-top: 4px;
-}
-
-.Authentication button[type="submit"]:hover,
-.Login button[type="submit"]:hover {
-  background: var(--ls-green-800);
-  box-shadow: 0 4px 14px oklch(30% 0.11 152 / 0.38);
+.ButtonBar .map-button:hover,
+.map-button:hover {
+  background: var(--ls-teal-800) !important;
+  border-color: var(--ls-teal-800) !important;
+  color: #fff !important;
+  box-shadow: var(--ls-shadow-md) !important;
   transform: translateY(-1px);
 }
-
-.Authentication button[type="submit"]:active,
-.Login button[type="submit"]:active {
-  transform: translateY(0);
+.map-button.active,
+.ButtonBar .map-button.active {
+  background: var(--ls-gold-500) !important;
+  border-color: var(--ls-gold-600) !important;
+  color: var(--ls-ink) !important;
 }
 
-/* Error state */
-.Authentication .login-error,
-.Login .login-error,
-.Authentication .error-msg,
-.Login .error {
-  background: oklch(55% 0.14 25 / 0.08);
-  border-left: 3px solid oklch(55% 0.14 25);
-  color: oklch(38% 0.14 25);
-  border-radius: 0 var(--ls-radius) var(--ls-radius) 0;
-  padding: 8px 12px;
-  font-size: 13px;
+/* ─── SideBar ───────────────────────────────────────────────────── */
+.SideBar {
+  background: var(--ls-surface);
+  border-right: 1px solid var(--ls-border);
+  box-shadow: var(--ls-shadow-md);
+}
+.SideBar .sidebar-title,
+.sidebar-title {
+  background: var(--ls-teal-800);
+  color: #fff;
+  font-family: var(--ls-font);
+  font-weight: 600;
 }
 
-/* ─── Inputs (global) ─────────────────────────────────────── */
+/* ─── Resizable windows / dialogs ───────────────────────────────── */
+.ResizableWindow,
+.resizable-window {
+  border-radius: var(--ls-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--ls-shadow-lg);
+  border: 1px solid var(--ls-border);
+}
+.ResizableWindow .resizablewindow-title,
+.resizablewindow-title,
+.ResizableWindow-titlebar,
+.dialog-title {
+  background: var(--ls-teal-800) !important;
+  color: #fff !important;
+  font-family: var(--ls-font);
+  font-weight: 600;
+}
+.ResizableWindow .resizablewindow-body,
+.resizablewindow-body {
+  background: var(--ls-surface);
+}
+
+/* ─── Forms & inputs ────────────────────────────────────────────── */
 input[type="text"],
 input[type="password"],
 input[type="email"],
 input[type="number"],
+input[type="search"],
 select,
 textarea {
-  border: 1px solid var(--ls-border);
+  font-family: var(--ls-font);
+  border: 1px solid var(--ls-border-strong);
   border-radius: var(--ls-radius);
-  background: var(--ls-surface);
+  background: #fff;
   color: var(--ls-ink);
-  font-family: var(--ls-font-body);
-  padding: 7px 10px;
-  transition: border-color 0.14s, box-shadow 0.14s;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
-
-input:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--ls-green-600);
-  box-shadow: 0 0 0 3px oklch(48% 0.13 152 / 0.15);
+  border-color: var(--ls-teal-500) !important;
+  box-shadow: 0 0 0 3px rgba(4, 88, 99, 0.12) !important;
   outline: none;
 }
 
-/* ─── Loading Splash ──────────────────────────────────────── */
-#splash {
-  background: var(--ls-green-700);
+/* ─── LayerTree ─────────────────────────────────────────────────── */
+.LayerTree,
+.layertree {
+  font-family: var(--ls-font);
+}
+.LayerTree .layertree-item.active,
+.LayerTree .layertree-item.selected,
+.layertree-item.active,
+.layertree-item.selected {
+  background: var(--ls-teal-50);
+  border-left: 3px solid var(--ls-teal-800);
+}
+.LayerTree .layertree-item:hover,
+.layertree-item:hover {
+  background: var(--ls-teal-50);
 }
 
-#splash .lds-dual-ring:after {
-  border-color: var(--ls-green-100) transparent var(--ls-green-100) transparent;
+/* ─── FeatureForm / Editing ─────────────────────────────────────── */
+.FeatureForm,
+.Editing,
+.feature-form {
+  font-family: var(--ls-font);
+}
+.FeatureForm label,
+.Editing label,
+.feature-form label {
+  color: var(--ls-ink-400);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 3px;
+}
+.FeatureForm input,
+.FeatureForm select,
+.FeatureForm textarea {
+  border: 1px solid var(--ls-border-strong);
+  border-radius: var(--ls-radius);
+  background: #fff;
+  font-family: var(--ls-font);
+}
+.FeatureForm input:focus,
+.FeatureForm select:focus {
+  border-color: var(--ls-teal-500);
+  box-shadow: 0 0 0 3px rgba(4, 88, 99, 0.10);
 }
 
-/* ─── Scrollbars ──────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* ─── Identify ──────────────────────────────────────────────────── */
+.Identify,
+.identify-result {
+  font-family: var(--ls-font);
+}
+.Identify table.featureattributes td:first-child,
+.featureattributes td.identify-attr-key {
+  color: var(--ls-ink-400);
+  font-size: 11.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  padding-right: 12px;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--ls-green-50);
+/* ─── Login dialog ──────────────────────────────────────────────── */
+.Login,
+.login-wrapper {
+  font-family: var(--ls-font);
+}
+.Login label,
+.login-wrapper label {
+  color: var(--ls-ink-500);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+  margin-top: 12px;
+}
+.Login input[type="text"],
+.Login input[type="password"] {
+  border: 1px solid var(--ls-border-strong) !important;
+  border-radius: var(--ls-radius) !important;
+  background: #fff !important;
+  font-family: var(--ls-font) !important;
+  font-size: 14px !important;
+  padding: 8px 10px !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+.Login input[type="text"]:focus,
+.Login input[type="password"]:focus {
+  border-color: var(--ls-teal-500) !important;
+  box-shadow: 0 0 0 3px rgba(4, 88, 99, 0.12) !important;
+  outline: none !important;
+}
+.Login button[type="submit"],
+.Login input[type="submit"],
+.Login .login-submit {
+  background: var(--ls-teal-800) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: var(--ls-radius) !important;
+  padding: 10px 20px !important;
+  font-family: var(--ls-font) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  margin-top: 16px;
+}
+.Login button[type="submit"]:hover,
+.Login input[type="submit"]:hover {
+  background: var(--ls-teal-700) !important;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--ls-green-300);
-  border-radius: 3px;
+/* ─── Portal / Theme menu ───────────────────────────────────────── */
+.Portal,
+.portal-content {
+  font-family: var(--ls-font);
+}
+.themetile:hover {
+  background: var(--ls-teal-50);
+  border-color: var(--ls-teal-300);
+}
+.themetile.active {
+  border-color: var(--ls-teal-800) !important;
+  box-shadow: 0 0 0 2px rgba(4, 88, 99, 0.18);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--ls-green-500);
+/* ─── AppMenu ───────────────────────────────────────────────────── */
+.AppMenu,
+.appmenu {
+  background: #fff;
+  box-shadow: var(--ls-shadow-lg);
+  border-radius: var(--ls-radius-lg);
+  font-family: var(--ls-font);
+}
+.AppMenu .appmenu-button:hover,
+.appmenu-button:hover {
+  background: var(--ls-teal-50);
+  color: var(--ls-teal-800);
+}
+.AppMenu .appmenu-button.active,
+.appmenu-button.active {
+  background: var(--ls-teal-800);
+  color: #fff;
 }
 
-/* ─── Selection ───────────────────────────────────────────── */
+/* ─── Scrollbars ────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--ls-ink-50); }
+::-webkit-scrollbar-thumb { background: var(--ls-teal-300); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ls-teal-500); }
+
+/* ─── Selection ─────────────────────────────────────────────────── */
 ::selection {
-  background: oklch(48% 0.13 152 / 0.22);
+  background: rgba(4, 88, 99, 0.18);
   color: var(--ls-ink);
 }
 
-/* ─── Global checkboxes ───────────────────────────────────── */
-input[type="checkbox"],
-input[type="radio"] {
-  accent-color: var(--ls-green-700);
+/* ─── Loading splash ────────────────────────────────────────────── */
+div#splash {
+  background: var(--ls-teal-800) !important;
+}
+.lds-dual-ring:after {
+  border-color: rgba(255,255,255,0.85) transparent rgba(255,255,255,0.85) transparent !important;
 }
 
-/* ─── Mobile ──────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .BottomBar { font-size: 11px; }
-
-  .Authentication,
-  .Authentication .login-dialog,
-  .Login {
-    border-radius: var(--ls-radius-md) !important;
-    min-width: unset;
-    width: calc(100vw - 32px) !important;
-    margin: 16px;
-  }
-
-  .Authentication .login-header,
-  .Login .login-header {
-    padding: 22px 20px 18px;
-  }
-
-  .Authentication .login-form,
-  .Login form {
-    padding: 18px 20px 24px;
-  }
+/* ─── OpenLayers attribution ────────────────────────────────────── */
+.ol-attribution {
+  background: rgba(250, 252, 252, 0.80);
+  border-radius: var(--ls-radius);
+  font-family: var(--ls-font);
+  font-size: 11px;
+  color: var(--ls-ink-400);
 }
+.ol-attribution a { color: var(--ls-teal-700); }

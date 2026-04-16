@@ -303,17 +303,18 @@
       {
         "name": "Portal",
         "cfg": {
-          "logo": "logo.svg",
-          "topBarText": "LILASp WebGIS",
+          "logo": "qwc-logo.svg",
+          "topBarText": "",
           "showMenuOnStartup": true,
           "keepMenuOpen": true,
           "bottomBarLinks": [
-              {"href": "https://lilasp.de", "label": "lilasp.de", "target": "_blank"}
+              {"href": "https://qfield.lilasp.de", "label": "QFieldCloud"},
+              {"href": "https://lilasp.de", "label": "lilasp.de"}
           ],
           "menuItems": [
               {"key": "Tools", "icon": "tools", "title": "Links", "subitems": [
                 {"icon": "link", "title": "QFieldCloud", "url": "https://qfield.lilasp.de"},
-                {"icon": "link", "title": "BIM", "url": "https://bim.lilasp.de"}
+                {"icon": "link", "title": "lilasp.de", "url": "https://lilasp.de"}
               ]}
           ]
         }
