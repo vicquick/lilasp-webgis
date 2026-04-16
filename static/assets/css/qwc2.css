@@ -208,72 +208,73 @@ body {
 }
 
 /* ───────────────────────────────────────────────────────────────── */
-/* Top bar — lilac, warm, serif wordmark                             */
+/* Top bar — lilac; brand identity comes from logo.svg, no CSS hacks  */
+/* QWC2 structure: #TopBar > .topbar-logo + .topbar-center-span       */
+/*                             + .topbar-search-container + menu btn  */
 /* ───────────────────────────────────────────────────────────────── */
-.TopBar, .topbar, .TopBar-container {
-  background: var(--ls-lilac-800) !important;
-  color: var(--ls-surface) !important;
+#TopBar {
+  background: var(--ls-lilac-800);
+  color: var(--ls-surface);
   border-bottom: 1px solid var(--ls-lilac-900);
   box-shadow: var(--ls-shadow-sm);
-  height: var(--topbar-height) !important;
+  height: var(--topbar-height);
+  min-height: var(--topbar-height);
+  display: flex;
+  align-items: center;
+  padding: 0 6px 0 12px;
 }
-.TopBar *, .topbar * { color: inherit; }
+#TopBar * { color: inherit; }
 
-.TopBar .search-box, .searchbox-container, .SearchBox {
+.topbar-logo {
+  height: 26px;
+  width: auto;
+  flex: 0 0 auto;
+  margin-right: 6px;
+}
+.topbar-center-span {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.topbar-search-container {
+  flex: 0 1 380px;
+  min-width: 0;
   background: oklch(0.995 0.003 85 / 0.12);
   border: 1px solid oklch(0.995 0.003 85 / 0.22);
-  color: var(--ls-surface);
   border-radius: var(--ls-radius);
-  padding: 6px 12px;
   transition: background .15s, border-color .15s;
 }
-.TopBar .search-box::placeholder, .SearchBox input::placeholder {
-  color: oklch(0.995 0.003 85 / 0.62);
-}
-.TopBar .search-box:focus-within,
-.SearchBox:focus-within {
+.topbar-search-container:focus-within {
   background: oklch(0.995 0.003 85 / 0.22);
   border-color: var(--ls-amber-500);
 }
+.topbar-search-container input,
+.searchbox-field input {
+  background: transparent !important;
+  border: none !important;
+  color: var(--ls-surface) !important;
+  padding: 8px 12px;
+  height: 32px;
+}
+.topbar-search-container input::placeholder { color: oklch(0.995 0.003 85 / 0.62) !important; }
 
-.TopBar .icon-button, .TopBar button, .TopBar .menu-button {
+/* App-menu button on right side of TopBar */
+.appmenu-button {
   color: var(--ls-surface);
   background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px 10px;
   border-radius: var(--ls-radius-sm);
   transition: background .15s;
+  flex: 0 0 auto;
 }
-.TopBar .icon-button:hover, .TopBar button:hover {
-  background: oklch(0.995 0.003 85 / 0.14);
-}
-.TopBar .icon-button.active, .TopBar button.active {
-  background: var(--ls-amber-500);
-  color: var(--ls-ink);
-}
-
-/* Brand wordmark: left logo → LILASp text */
-.TopBar .logo, .topbar .logo {
-  height: calc(var(--topbar-height) - 14px);
-  width: auto;
-}
-.TopBar .logo-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 16px;
-}
-.TopBar .logo-container::after {
-  content: 'LILASp';
-  font-family: var(--ls-font-display);
-  font-size: 18px;
-  font-weight: 500;
-  font-variation-settings: 'SOFT' 80, 'opsz' 20;
-  font-style: italic;
-  letter-spacing: -0.015em;
-  color: var(--ls-surface);
-  border-left: 1px solid oklch(0.995 0.003 85 / 0.22);
-  padding-left: 12px;
-  line-height: 1;
-}
+.appmenu-button:hover { background: oklch(0.995 0.003 85 / 0.14); }
+.appmenu-button.appmenu-button-open { background: oklch(0.995 0.003 85 / 0.18); }
+.appmenu-label { font-family: var(--ls-font-sans); font-weight: 500; font-size: 13px; }
+.appmenu-icon { filter: brightness(2.2); opacity: 0.92; }
 
 /* ───────────────────────────────────────────────────────────────── */
 /* Bottom bar — mono readouts                                         */

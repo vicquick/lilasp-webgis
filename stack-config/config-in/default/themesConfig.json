@@ -1,10 +1,33 @@
 {
-    "defaultScales": [500000, 200000, 100000, 50000, 25000, 10000, 5000, 2500, 1000, 500, 250, 100],
+    "defaultScales": [
+        2000000,
+        1000000,
+        500000,
+        200000,
+        100000,
+        50000,
+        25000,
+        10000,
+        5000,
+        2500,
+        1000,
+        500,
+        250,
+        100,
+        50
+    ],
     "defaultWMSVersion": "1.3.0",
     "defaultBackgroundLayers": [
-        {"name": "osm", "printLayer": "osm", "visibility": true}
+        {
+            "name": "osm",
+            "printLayer": "osm",
+            "visibility": true
+        }
     ],
-    "defaultSearchProviders": ["coordinates", "nominatim"],
+    "defaultSearchProviders": [
+        "coordinates",
+        "nominatim"
+    ],
     "defaultMapCrs": "EPSG:25832",
     "defaultTheme": "wiesbaden",
     "themes": {
@@ -19,16 +42,24 @@
                         "url": "/ows/LILASp_Wiesbaden_Spielplaetze",
                         "attribution": "LILASp · Stadt Wiesbaden",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true}
+                            {
+                                "name": "osm",
+                                "printLayer": "osm",
+                                "visibility": true
+                            }
                         ],
-                        "searchProviders": ["coordinates", "nominatim"],
-                        "additionalMouseCrs": ["EPSG:4326"],
-                        "scales": [100000, 50000, 25000, 10000, 5000, 2500, 1000, 500, 250],
-                        "printScales": [10000, 5000, 2500, 1000, 500],
-                        "printResolutions": [150, 300],
-                        "printGrid": [
-                            {"s": 10000, "x": 1000, "y": 1000},
-                            {"s": 1000, "x": 100, "y": 100}
+                        "searchProviders": [
+                            "coordinates",
+                            "nominatim"
+                        ],
+                        "additionalMouseCrs": [
+                            "EPSG:4326"
+                        ],
+                        "extent": [
+                            3434102,
+                            5539700,
+                            3456468,
+                            5556157
                         ]
                     }
                 ]
@@ -42,13 +73,25 @@
                         "url": "/ows/LILASp_Frankfurt_FFEP",
                         "attribution": "LILASp · Stadt Frankfurt",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true}
+                            {
+                                "name": "osm",
+                                "printLayer": "osm",
+                                "visibility": true
+                            }
                         ],
-                        "searchProviders": ["coordinates", "nominatim"],
-                        "additionalMouseCrs": ["EPSG:4326"],
-                        "scales": [100000, 50000, 25000, 10000, 5000, 2500, 1000],
-                        "printScales": [10000, 5000, 2500, 1000],
-                        "printResolutions": [150, 300]
+                        "searchProviders": [
+                            "coordinates",
+                            "nominatim"
+                        ],
+                        "additionalMouseCrs": [
+                            "EPSG:4326"
+                        ],
+                        "extent": [
+                            462032,
+                            5540989,
+                            485735,
+                            5564223
+                        ]
                     },
                     {
                         "id": "frankfurt_nep",
@@ -56,13 +99,25 @@
                         "url": "/ows/LILASp_Frankfurt_Naturerlebnisprofile",
                         "attribution": "LILASp · Stadt Frankfurt",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true}
+                            {
+                                "name": "osm",
+                                "printLayer": "osm",
+                                "visibility": true
+                            }
                         ],
-                        "searchProviders": ["coordinates", "nominatim"],
-                        "additionalMouseCrs": ["EPSG:4326"],
-                        "scales": [100000, 50000, 25000, 10000, 5000, 2500, 1000],
-                        "printScales": [10000, 5000, 2500, 1000],
-                        "printResolutions": [150, 300]
+                        "searchProviders": [
+                            "coordinates",
+                            "nominatim"
+                        ],
+                        "additionalMouseCrs": [
+                            "EPSG:4326"
+                        ],
+                        "extent": [
+                            462032,
+                            5540989,
+                            485735,
+                            5564223
+                        ]
                     },
                     {
                         "id": "frankfurt_plaetze",
@@ -70,13 +125,25 @@
                         "url": "/ows/LILASp_Frankfurt_Plaetze",
                         "attribution": "LILASp · Stadt Frankfurt",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true}
+                            {
+                                "name": "osm",
+                                "printLayer": "osm",
+                                "visibility": true
+                            }
                         ],
-                        "searchProviders": ["coordinates", "nominatim"],
-                        "additionalMouseCrs": ["EPSG:4326"],
-                        "scales": [50000, 25000, 10000, 5000, 2500, 1000, 500],
-                        "printScales": [5000, 2500, 1000, 500],
-                        "printResolutions": [150, 300]
+                        "searchProviders": [
+                            "coordinates",
+                            "nominatim"
+                        ],
+                        "additionalMouseCrs": [
+                            "EPSG:4326"
+                        ],
+                        "extent": [
+                            462032,
+                            5540989,
+                            485735,
+                            5564223
+                        ]
                     },
                     {
                         "id": "frankfurt_wege",
@@ -84,13 +151,25 @@
                         "url": "/ows/LILASp_Frankfurt_Wege",
                         "attribution": "LILASp · Stadt Frankfurt",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true}
+                            {
+                                "name": "osm",
+                                "printLayer": "osm",
+                                "visibility": true
+                            }
                         ],
-                        "searchProviders": ["coordinates", "nominatim"],
-                        "additionalMouseCrs": ["EPSG:4326"],
-                        "scales": [100000, 50000, 25000, 10000, 5000, 2500, 1000],
-                        "printScales": [10000, 5000, 2500, 1000],
-                        "printResolutions": [150, 300]
+                        "searchProviders": [
+                            "coordinates",
+                            "nominatim"
+                        ],
+                        "additionalMouseCrs": [
+                            "EPSG:4326"
+                        ],
+                        "extent": [
+                            462032,
+                            5540989,
+                            485735,
+                            5564223
+                        ]
                     },
                     {
                         "id": "frankfurt_orte",
@@ -98,13 +177,25 @@
                         "url": "/ows/LILASp_Frankfurt_Orte",
                         "attribution": "LILASp · Stadt Frankfurt",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true}
+                            {
+                                "name": "osm",
+                                "printLayer": "osm",
+                                "visibility": true
+                            }
                         ],
-                        "searchProviders": ["coordinates", "nominatim"],
-                        "additionalMouseCrs": ["EPSG:4326"],
-                        "scales": [100000, 50000, 25000, 10000, 5000, 2500, 1000],
-                        "printScales": [10000, 5000, 2500, 1000],
-                        "printResolutions": [150, 300]
+                        "searchProviders": [
+                            "coordinates",
+                            "nominatim"
+                        ],
+                        "additionalMouseCrs": [
+                            "EPSG:4326"
+                        ],
+                        "extent": [
+                            462032,
+                            5540989,
+                            485735,
+                            5564223
+                        ]
                     }
                 ]
             },
@@ -117,13 +208,25 @@
                         "url": "/ows/LILASp_Cuxhaven_Spielplaetze",
                         "attribution": "LILASp · Stadt Cuxhaven",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true}
+                            {
+                                "name": "osm",
+                                "printLayer": "osm",
+                                "visibility": true
+                            }
                         ],
-                        "searchProviders": ["coordinates", "nominatim"],
-                        "additionalMouseCrs": ["EPSG:4326"],
-                        "scales": [50000, 25000, 10000, 5000, 2500, 1000, 500, 250],
-                        "printScales": [5000, 2500, 1000, 500],
-                        "printResolutions": [150, 300]
+                        "searchProviders": [
+                            "coordinates",
+                            "nominatim"
+                        ],
+                        "additionalMouseCrs": [
+                            "EPSG:4326"
+                        ],
+                        "extent": [
+                            470347,
+                            5959139,
+                            488178,
+                            5974636
+                        ]
                     }
                 ]
             },
@@ -136,13 +239,25 @@
                         "url": "/ows/LILASp_Schnelsen_Baeume",
                         "attribution": "LILASp · HCS",
                         "backgroundLayers": [
-                            {"name": "osm", "printLayer": "osm", "visibility": true}
+                            {
+                                "name": "osm",
+                                "printLayer": "osm",
+                                "visibility": true
+                            }
                         ],
-                        "searchProviders": ["coordinates", "nominatim"],
-                        "additionalMouseCrs": ["EPSG:4326"],
-                        "scales": [50000, 25000, 10000, 5000, 2500, 1000, 500],
-                        "printScales": [5000, 2500, 1000, 500],
-                        "printResolutions": [150, 300]
+                        "searchProviders": [
+                            "coordinates",
+                            "nominatim"
+                        ],
+                        "additionalMouseCrs": [
+                            "EPSG:4326"
+                        ],
+                        "extent": [
+                            557569,
+                            5943973,
+                            564740,
+                            5951859
+                        ]
                     }
                 ]
             }
