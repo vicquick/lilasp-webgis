@@ -3,10 +3,11 @@
 Replaces qwc-auth-service. Validates credentials against QFieldCloud,
 maps QFC project roles to QWC2 JWT groups, issues signed JWT cookie.
 
-Endpoints expected by qwc-services:
-  POST /auth/login     — log in, set jwt cookie
-  POST /auth/logout    — clear jwt cookie
-  GET  /auth/userinfo  — return user info from jwt
+Endpoints expected by QWC2:
+  GET  /auth/login     — HTML login form (with ?url= return param)
+  POST /auth/login     — process form, set JWT cookie, redirect to ?url
+  POST /auth/logout    — clear cookie, redirect
+  GET  /auth/userinfo  — JSON user info from JWT
 """
 from __future__ import annotations
 
@@ -14,13 +15,13 @@ import logging
 import os
 import secrets
 import time
-from functools import wraps
+from urllib.parse import urlparse
 
 import jwt
 import requests
-from flask import Flask, jsonify, make_response, request
+from flask import Flask, jsonify, make_response, redirect, render_template, request
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates", static_folder="static", static_url_path="/auth/static")
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
@@ -32,7 +33,6 @@ COOKIE_NAME = "jwt"
 COOKIE_SECURE = os.environ.get("FLASK_ENV") == "production"
 
 # QFC project name → QWC2 theme slug
-# Add new projects here as they go live in WebGIS
 PROJECT_THEME_MAP: dict[str, str] = {
     "WIE_Spielplaetze": "wiesbaden",
     "CUX_Spielplaetze": "cuxhaven",
@@ -44,12 +44,21 @@ PROJECT_THEME_MAP: dict[str, str] = {
     "Schnelsen_HCS_Baeume": "schnelsen_baeume",
 }
 
-# QFC roles that grant write access in QWC2
 WRITE_ROLES = {"owner", "manager", "admin", "editor"}
 
 
+def _safe_return_url(url: str | None) -> str:
+    """Only allow relative URLs or same-host URLs, to prevent open redirect."""
+    if not url:
+        return "/"
+    parsed = urlparse(url)
+    if parsed.netloc and parsed.netloc != request.host:
+        return "/"
+    # Keep path + query + fragment
+    return parsed.path + (f"?{parsed.query}" if parsed.query else "") + (f"#{parsed.fragment}" if parsed.fragment else "") or "/"
+
+
 def _qfc_login(username: str, password: str) -> str | None:
-    """Authenticate against QFC, return QFC token or None."""
     try:
         r = requests.post(
             f"{QFC_BASE}/auth/login/",
@@ -64,7 +73,6 @@ def _qfc_login(username: str, password: str) -> str | None:
 
 
 def _qfc_projects(qfc_token: str) -> list[dict]:
-    """Fetch all projects visible to this user, with their role."""
     try:
         r = requests.get(
             f"{QFC_BASE}/projects/",
@@ -79,10 +87,6 @@ def _qfc_projects(qfc_token: str) -> list[dict]:
 
 
 def _build_groups(projects: list[dict]) -> list[str]:
-    """Map QFC project roles to QWC2 group names.
-
-    Format: {theme}_{access}  where access = 'reader' | 'editor'
-    """
     groups: list[str] = []
     for proj in projects:
         name = proj.get("name", "")
@@ -96,7 +100,6 @@ def _build_groups(projects: list[dict]) -> list[str]:
 
 
 def _issue_jwt(username: str, groups: list[str]) -> tuple[str, str]:
-    """Return (jwt_token, csrf_token)."""
     csrf = secrets.token_hex(16)
     now = int(time.time())
     payload = {
@@ -118,25 +121,49 @@ def _decode_jwt(token: str) -> dict | None:
         return None
 
 
+def _wants_json() -> bool:
+    """Detect XHR/JSON client vs browser navigation."""
+    accept = request.headers.get("Accept", "")
+    if "application/json" in accept and "text/html" not in accept:
+        return True
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return True
+    if request.is_json:
+        return True
+    return False
+
+
 @app.route("/auth/login", methods=["GET"])
 def login_page():
-    """QWC2 expects a redirect-able login page for unauthenticated access."""
-    return jsonify({"login_url": "/auth/login"}), 200
+    return_url = _safe_return_url(request.args.get("url"))
+    if _wants_json():
+        return jsonify({"login_url": f"/auth/login?url={return_url}"}), 200
+    token = request.cookies.get(COOKIE_NAME)
+    if token and _decode_jwt(token):
+        return redirect(return_url or "/")
+    return render_template("login.html", error=None, return_url=return_url)
 
 
 @app.route("/auth/login", methods=["POST"])
 def login():
-    data = request.get_json(force=True, silent=True) or {}
-    username = (data.get("username") or request.form.get("username", "")).strip()
-    password = data.get("password") or request.form.get("password", "")
+    data = request.get_json(silent=True) if request.is_json else None
+    if data is None:
+        data = request.form
+    username = (data.get("username") or "").strip()
+    password = data.get("password") or ""
+    return_url = _safe_return_url(data.get("url"))
 
     if not username or not password:
-        return jsonify({"error": "username and password required"}), 400
+        if _wants_json():
+            return jsonify({"error": "username and password required"}), 400
+        return render_template("login.html", error="Benutzername und Passwort erforderlich.", return_url=return_url), 400
 
     qfc_token = _qfc_login(username, password)
     if not qfc_token:
         log.warning("Login failed for user: %s", username)
-        return jsonify({"error": "Authentication failed"}), 401
+        if _wants_json():
+            return jsonify({"error": "Authentication failed"}), 401
+        return render_template("login.html", error="Anmeldung fehlgeschlagen. Zugangsdaten prüfen.", return_url=return_url), 401
 
     projects = _qfc_projects(qfc_token)
     groups = _build_groups(projects)
@@ -144,24 +171,32 @@ def login():
 
     log.info("Login OK: %s groups=%s", username, groups)
 
-    resp = make_response(
-        jsonify({"username": username, "csrf_token": csrf, "groups": groups})
-    )
+    if _wants_json():
+        resp = make_response(
+            jsonify({"username": username, "csrf_token": csrf, "groups": groups})
+        )
+    else:
+        resp = make_response(redirect(return_url or "/"))
     resp.set_cookie(
         COOKIE_NAME,
         jwt_token,
         httponly=True,
         secure=COOKIE_SECURE,
-        samesite="Strict",
+        samesite="Lax",
         max_age=JWT_EXPIRY,
+        path="/",
     )
     return resp
 
 
 @app.route("/auth/logout", methods=["POST", "GET"])
 def logout():
-    resp = make_response(jsonify({"message": "logged out"}))
-    resp.delete_cookie(COOKIE_NAME)
+    return_url = _safe_return_url(request.args.get("url"))
+    if _wants_json():
+        resp = make_response(jsonify({"message": "logged out"}))
+    else:
+        resp = make_response(redirect(return_url or "/"))
+    resp.delete_cookie(COOKIE_NAME, path="/")
     return resp
 
 

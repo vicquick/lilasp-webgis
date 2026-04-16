@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anmelden — LILASp WebGIS</title>
+<link rel="icon" href="/auth/static/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --lilac-50:  oklch(0.975 0.012 300);
+  --lilac-100: oklch(0.945 0.024 300);
+  --lilac-200: oklch(0.885 0.052 300);
+  --lilac-300: oklch(0.780 0.088 300);
+  --lilac-400: oklch(0.660 0.118 300);
+  --lilac-500: oklch(0.570 0.138 300);
+  --lilac-600: oklch(0.500 0.142 300);
+  --lilac-700: oklch(0.420 0.128 300);
+  --lilac-800: oklch(0.340 0.100 300);
+  --lilac-900: oklch(0.260 0.070 300);
+  --lilac-950: oklch(0.180 0.050 300);
+
+  --amber:     oklch(0.780 0.140 75);
+  --amber-dim: oklch(0.650 0.128 65);
+
+  --ink:       oklch(0.215 0.018 300);
+  --ink-70:    oklch(0.400 0.012 300);
+  --ink-50:    oklch(0.580 0.008 300);
+  --ink-30:    oklch(0.750 0.006 300);
+
+  --canvas:    oklch(0.985 0.006 85);
+  --surface:   oklch(0.995 0.003 85);
+  --rule:      oklch(0.900 0.010 300);
+  --rule-soft: oklch(0.940 0.008 300);
+
+  --err:       oklch(0.560 0.180 25);
+  --ok:        oklch(0.580 0.140 155);
+
+  --radius:    6px;
+  --shadow:    0 1px 0 oklch(0.215 0.018 300 / 0.04),
+               0 20px 60px -30px oklch(0.260 0.070 300 / 0.28);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: 'Geist', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--canvas);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'ss01', 'cv11';
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 100vh;
+}
+@media (min-width: 960px) {
+  .shell { grid-template-columns: minmax(420px, 42%) 1fr; }
+}
+
+/* ── Left: form ─────────────────────────────────────────────────── */
+.panel {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(24px, 4vw, 56px);
+  background: var(--surface);
+  border-right: 1px solid var(--rule-soft);
+  position: relative;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: auto;
+}
+.brand__mark {
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  background: var(--lilac-600);
+  color: var(--surface);
+  border-radius: 3px;
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  font-style: italic;
+  font-variation-settings: 'SOFT' 100, 'opsz' 24;
+}
+.brand__word {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  font-variation-settings: 'SOFT' 50, 'opsz' 20;
+}
+.brand__word em { font-style: italic; color: var(--lilac-700); font-weight: 500; }
+
+.form-wrap {
+  max-width: 360px;
+  width: 100%;
+  margin: auto 0;
+}
+
+.eyebrow {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-50);
+  margin-bottom: 20px;
+}
+.eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 18px; height: 1px;
+  background: var(--ink-30);
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(32px, 4vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+  font-variation-settings: 'SOFT' 60, 'opsz' 60;
+  margin: 0 0 14px;
+  color: var(--ink);
+}
+h1 em {
+  font-style: italic;
+  color: var(--lilac-700);
+  font-variation-settings: 'SOFT' 100, 'opsz' 60;
+}
+
+.sub {
+  color: var(--ink-70);
+  font-size: 15px;
+  margin: 0 0 32px;
+  max-width: 34ch;
+}
+
+form { display: grid; gap: 18px; }
+
+.field { display: grid; gap: 6px; }
+.field > label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--ink-70);
+}
+.field > input {
+  font: inherit;
+  font-size: 15px;
+  padding: 11px 14px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.field > input::placeholder { color: var(--ink-30); }
+.field > input:hover { border-color: var(--lilac-300); }
+.field > input:focus {
+  border-color: var(--lilac-500);
+  box-shadow: 0 0 0 3px oklch(0.570 0.138 300 / 0.15);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--ink-70);
+  margin-top: -4px;
+}
+.row label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.row input[type=checkbox] {
+  appearance: none;
+  width: 14px; height: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--surface);
+  cursor: pointer;
+  position: relative;
+  transition: background .15s, border-color .15s;
+}
+.row input[type=checkbox]:checked {
+  background: var(--lilac-600);
+  border-color: var(--lilac-600);
+}
+.row input[type=checkbox]:checked::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 4px;
+  width: 3px; height: 7px;
+  border: solid var(--surface);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+button[type=submit] {
+  font: inherit;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 12px 18px;
+  background: var(--ink);
+  color: var(--surface);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background .15s, transform .15s;
+  margin-top: 6px;
+}
+button[type=submit]:hover { background: var(--lilac-800); }
+button[type=submit]:active { transform: translateY(1px); }
+button[type=submit]:disabled { background: var(--ink-30); cursor: not-allowed; }
+button[type=submit] svg { opacity: 0.7; transition: transform .2s; }
+button[type=submit]:hover svg { transform: translateX(2px); opacity: 1; }
+
+.err {
+  padding: 10px 12px;
+  background: oklch(0.560 0.180 25 / 0.08);
+  color: var(--err);
+  border-left: 2px solid var(--err);
+  border-radius: 2px;
+  font-size: 13px;
+  display: none;
+}
+.err.show { display: block; }
+
+.foot {
+  margin-top: auto;
+  padding-top: 32px;
+  font-size: 12px;
+  color: var(--ink-50);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  border-top: 1px solid var(--rule-soft);
+}
+.foot a { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--ink-30); }
+.foot a:hover { color: var(--lilac-700); border-color: var(--lilac-500); }
+.foot code {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-50);
+}
+
+/* ── Right: cartographic canvas ─────────────────────────────────── */
+.canvas {
+  display: none;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 30% 20%, oklch(0.945 0.024 300) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, oklch(0.960 0.020 85) 0%, transparent 50%),
+    var(--canvas);
+}
+@media (min-width: 960px) { .canvas { display: block; } }
+
+.canvas svg.contours {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  color: var(--lilac-400);
+  opacity: 0.55;
+}
+
+.readout {
+  position: absolute;
+  top: 32px; right: 32px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-50);
+  text-align: right;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+}
+.readout .k { color: var(--ink-30); }
+
+.plaque {
+  position: absolute;
+  left: 48px;
+  bottom: 48px;
+  max-width: 440px;
+  padding: 28px 32px;
+  background: oklch(0.995 0.003 85 / 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--rule-soft);
+  border-radius: 8px;
+}
+.plaque__kicker {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lilac-700);
+  margin-bottom: 12px;
+}
+.plaque__quote {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 400;
+  font-variation-settings: 'SOFT' 80, 'opsz' 30;
+  color: var(--ink);
+  margin: 0 0 14px;
+}
+.plaque__quote em {
+  font-style: italic;
+  color: var(--lilac-700);
+  font-variation-settings: 'SOFT' 100, 'opsz' 30;
+}
+.plaque__meta {
+  font-size: 12px;
+  color: var(--ink-50);
+  display: flex;
+  gap: 16px;
+}
+.plaque__meta span::before {
+  content: '·';
+  margin-right: 10px;
+  color: var(--ink-30);
+}
+.plaque__meta span:first-child::before { content: none; margin: 0; }
+
+/* ── Small screens: simpler ─────────────────────────────────────── */
+@media (max-width: 520px) {
+  .panel { padding: 24px; }
+  .foot { flex-direction: column; align-items: flex-start; gap: 10px; }
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── Form panel ──────────────────────────────────────────── -->
+  <div class="panel">
+
+    <div class="brand">
+      <div class="brand__mark">L</div>
+      <div class="brand__word"><em>LIL</em>ASp WebGIS</div>
+    </div>
+
+    <div class="form-wrap">
+      <div class="eyebrow">Authentifizierung</div>
+      <h1>Willkommen <em>zurück</em>.</h1>
+      <p class="sub">Anmeldung mit QFieldCloud-Zugangsdaten. Projektzugriff ergibt sich aus Ihren dortigen Rollen.</p>
+
+      {% if error %}
+      <div class="err show">{{ error }}</div>
+      {% endif %}
+      <div class="err" id="err-live"></div>
+
+      <form method="post" action="/auth/login" autocomplete="on">
+        <input type="hidden" name="url" value="{{ return_url }}">
+
+        <div class="field">
+          <label for="u">Benutzername</label>
+          <input type="text" id="u" name="username" required autofocus autocomplete="username" spellcheck="false" autocapitalize="none">
+        </div>
+
+        <div class="field">
+          <label for="p">Passwort</label>
+          <input type="password" id="p" name="password" required autocomplete="current-password">
+        </div>
+
+        <div class="row">
+          <label>
+            <input type="checkbox" name="remember" value="1" checked>
+            Angemeldet bleiben
+          </label>
+          <a href="https://qfield.lilasp.de/accounts/password/reset/" target="_blank" rel="noopener">Passwort vergessen?</a>
+        </div>
+
+        <button type="submit">
+          <span>Anmelden</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+
+    <div class="foot">
+      <div>
+        <a href="https://lilasp.de" target="_blank" rel="noopener">lilasp.de</a>
+        &nbsp;·&nbsp;
+        <a href="https://qfield.lilasp.de" target="_blank" rel="noopener">QFieldCloud</a>
+      </div>
+      <code>v2026.4</code>
+    </div>
+  </div>
+
+  <!-- ── Cartographic canvas ─────────────────────────────────── -->
+  <div class="canvas" aria-hidden="true">
+
+    <div class="readout">
+      <div><span class="k">53°</span>52′28″ N</div>
+      <div><span class="k">08°</span>41′45″ E</div>
+      <div style="margin-top:8px"><span class="k">EPSG</span> 25832</div>
+      <div><span class="k">ZOOM</span> 14.0</div>
+    </div>
+
+    <svg class="contours" viewBox="0 0 800 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="grain">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3"/>
+          <feColorMatrix values="0 0 0 0 0.5  0 0 0 0 0.45  0 0 0 0 0.55  0 0 0 0.04 0"/>
+          <feComposite in2="SourceGraphic" operator="in"/>
+        </filter>
+      </defs>
+      <g fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.55">
+        <path d="M-50,150 Q120,120 240,180 T480,160 Q620,140 870,210"/>
+        <path d="M-50,220 Q140,180 280,240 T520,230 Q660,210 870,280"/>
+        <path d="M-50,300 Q160,260 320,320 T560,310 Q700,290 870,360"/>
+        <path d="M-50,390 Q180,350 360,410 T600,400 Q740,380 870,450"/>
+        <path d="M-50,480 Q200,440 400,500 T640,490 Q770,470 870,540"/>
+        <path d="M-50,580 Q220,540 440,600 T680,590 Q790,570 870,640"/>
+        <path d="M-50,680 Q240,640 480,700 T720,690 Q810,670 870,740"/>
+        <path d="M-50,780 Q260,740 520,800 T760,790 Q830,770 870,840"/>
+      </g>
+      <g fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.7">
+        <path d="M-50,340 Q180,290 380,360 T620,345 Q760,325 870,400"/>
+        <path d="M-50,530 Q220,485 460,555 T700,540 Q800,520 870,595"/>
+      </g>
+      <!-- survey markers -->
+      <g fill="currentColor" opacity="0.6">
+        <circle cx="180" cy="360" r="2.5"/>
+        <circle cx="420" cy="480" r="2.5"/>
+        <circle cx="620" cy="650" r="2.5"/>
+      </g>
+      <g font-family="Geist Mono, monospace" font-size="9" fill="currentColor" opacity="0.55" letter-spacing="0.1em">
+        <text x="190" y="355">M.217</text>
+        <text x="430" y="475">M.341</text>
+        <text x="630" y="645">M.508</text>
+      </g>
+      <rect width="800" height="900" filter="url(#grain)" opacity="0.5"/>
+    </svg>
+
+    <div class="plaque">
+      <div class="plaque__kicker">Spielplätze · Frankfurt · Wiesbaden · Cuxhaven</div>
+      <p class="plaque__quote">Kartographie ist <em>geduldig</em>. Sie wartet auf den, der genau hinschaut.</p>
+      <div class="plaque__meta">
+        <span>7 Datenbanken</span>
+        <span>3 Kommunen</span>
+        <span>QGIS 3.40</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Preserve ?url= query param through form submission if server didn't inject it
+(function(){
+  const params = new URLSearchParams(location.search);
+  const url = params.get('url');
+  if (url) {
+    const hidden = document.querySelector('input[name=url]');
+    if (hidden && !hidden.value) hidden.value = url;
+  }
+  // Enhance submit: disable double-click
+  const form = document.querySelector('form');
+  const btn = form.querySelector('button[type=submit]');
+  form.addEventListener('submit', () => {
+    btn.disabled = true;
+    btn.querySelector('span').textContent = 'Anmelden…';
+  });
+})();
+</script>
+</body>
+</html>

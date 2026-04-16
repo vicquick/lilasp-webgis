@@ -1,121 +1,208 @@
-:root.highcontrast {
-    /* Base colors */
-    --text-color: black;
-    --text-color-link: blue;
-    --text-color-disabled: #999;
-    --container-bg-color: white;
-    --input-bg-color: white;
-    --input-bg-color-disabled: white;
-    --border-color: black;
-    --color-active: blue;
-    --focus-outline: 2px solid black;
-    /* Tooltips */
-    --tooltip-bg-color: rgba(0, 0, 0, 0.75);
-    --tooltip-text-color: white;
-    --tooltip-border-color: black;
-    /* Map buttons */
-    --map-button-bg-color: black;
-    --map-button-text-color: white;
-    --map-button-hover-bg-color: white;
-    --map-button-hover-text-color: black;
-    --map-button-active-bg-color: white;
-    --map-button-active-text-color: black;
-    /* Panels (topbar and bottom bar) */
-    --panel-bg-color: rgba(255, 255, 255, 0.85);
-    --panel-text-color: black;
-    /* Titlebars */
-    --titlebar-bg-color: black;
-    --titlebar-text-color: white;
-    /* Button */
-    --button-bg-color: white;
-    --button-bg-color-hover: #ddd;
-    --button-bg-color-active: black;
-    --button-bg-color-active-hover: #222;
-    --button-bg-color-disabled: white;
-    --button-text-color: black;
-    --button-text-color-hover: black;
-    --button-text-color-active: white;
-    --button-text-color-active-hover: white;
-    --button-text-color-disabled: #999;
-    /* List */
-    --list-bg-color: white;
-    --list-section-bg-color: black;
-    --list-section-text-color: white;
-    --list-item-bg-color-even: #eee;
-    --list-item-bg-color-hover: #ddd;
-    --list-item-bg-color-active: #aaa;
-    --list-item-bg-color-active-hover: #bbb;
-    --list-item-text-color-hover: black;
-    --list-item-text-color-active: black;
-    --list-item-text-color-active-hover: black;
-    /* App menu */
-    --app-menu-bg-color: white;
-    --app-menu-text-color: black;
-    --app-menu-bg-color-hover: #ddd;
-    --app-menu-text-color-hover: black;
-    --app-submenu-bg-color: black;
-    --app-submenu-text-color: white;
-    --app-submenu-bg-color-hover: #222;
-    --app-submenu-text-color-hover: white;
+/* ═══════════════════════════════════════════════════════════════════
+   LILASp colour schemes — default / dark / high-contrast
+   OKLCH throughout for perceptual uniformity.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── default (light, cartographic editorial) ─────────────────────── */
+html.color-scheme-default, html:not([class*=color-scheme]) {
+  color-scheme: light;
+  /* Tokens already set in qwc2.css :root — nothing to override */
 }
 
-:root.dark {
-    /* Base */
-    --text-color: #e6edf3;
-    --text-color-link: #7bb8c4;
-    --text-color-disabled: #6b7280;
-    --container-bg-color: #161b22;
-    --input-bg-color: #21262d;
-    --input-bg-color-disabled: #0d1117;
-    --border-color: rgba(255, 255, 255, 0.08);
-    --color-active: #5e9aa8;
-    --focus-outline: 2px solid #5e9aa8;
-    /* Tooltips */
-    --tooltip-bg-color: rgba(13, 17, 23, 0.92);
-    --tooltip-text-color: #e6edf3;
-    --tooltip-border-color: #045863;
-    /* Map buttons */
-    --map-button-bg-color: #21262d;
-    --map-button-text-color: #7bb8c4;
-    --map-button-hover-bg-color: #0a8394;
-    --map-button-hover-text-color: #fff;
-    --map-button-active-bg-color: #ffb300;
-    --map-button-active-text-color: #0d1117;
-    /* Panels (topbar and bottom bar) */
-    --panel-bg-color: rgba(22, 27, 34, 0.90);
-    --panel-text-color: #e6edf3;
-    /* Titlebars */
-    --titlebar-bg-color: #045863;
-    --titlebar-text-color: #fff;
-    /* Button */
-    --button-bg-color: #21262d;
-    --button-bg-color-hover: #2d333b;
-    --button-bg-color-active: #0a8394;
-    --button-bg-color-active-hover: #066d7a;
-    --button-bg-color-disabled: #161b22;
-    --button-text-color: #e6edf3;
-    --button-text-color-hover: #fff;
-    --button-text-color-active: #fff;
-    --button-text-color-active-hover: #fff;
-    --button-text-color-disabled: #6b7280;
-    /* List */
-    --list-bg-color: #21262d;
-    --list-section-bg-color: #0d1117;
-    --list-section-text-color: #e6edf3;
-    --list-item-bg-color-even: #1c2128;
-    --list-item-bg-color-hover: rgba(94, 154, 168, 0.15);
-    --list-item-bg-color-active: #045863;
-    --list-item-bg-color-active-hover: #066d7a;
-    --list-item-text-color-hover: #e6edf3;
-    --list-item-text-color-active: #fff;
-    --list-item-text-color-active-hover: #fff;
-    /* App menu */
-    --app-menu-bg-color: #21262d;
-    --app-menu-text-color: #e6edf3;
-    --app-menu-bg-color-hover: rgba(94, 154, 168, 0.18);
-    --app-menu-text-color-hover: #7bb8c4;
-    --app-submenu-bg-color: #0d1117;
-    --app-submenu-text-color: #e6edf3;
-    --app-submenu-bg-color-hover: #045863;
-    --app-submenu-text-color-hover: #fff;
+/* ═══════════════════════════════════════════════════════════════════
+   DARK — ink canvas, pale lilac primary, warm amber accent
+   Not glowy-AI: calm, readable, editorial.
+   ═══════════════════════════════════════════════════════════════════ */
+html.color-scheme-dark, :root.dark {
+  color-scheme: dark;
+
+  --ls-canvas:   oklch(0.195 0.018 300);
+  --ls-surface:  oklch(0.230 0.020 300);
+  --ls-raised:   oklch(0.265 0.022 300);
+  --ls-tint:     oklch(0.245 0.022 300);
+
+  --ls-ink:      oklch(0.945 0.012 85);
+  --ls-ink-90:   oklch(0.900 0.010 85);
+  --ls-ink-70:   oklch(0.800 0.010 85);
+  --ls-ink-60:   oklch(0.700 0.012 85);
+  --ls-ink-50:   oklch(0.620 0.012 85);
+  --ls-ink-40:   oklch(0.520 0.010 85);
+  --ls-ink-30:   oklch(0.420 0.012 300);
+  --ls-ink-20:   oklch(0.340 0.014 300);
+  --ls-ink-10:   oklch(0.280 0.016 300);
+
+  --ls-rule:      oklch(0.320 0.022 300);
+  --ls-rule-soft: oklch(0.270 0.020 300);
+  --ls-rule-bold: oklch(0.400 0.026 300);
+
+  /* Lilacs shift lighter on dark */
+  --ls-lilac-50:  oklch(0.280 0.022 300);
+  --ls-lilac-100: oklch(0.325 0.036 300);
+  --ls-lilac-200: oklch(0.380 0.058 300);
+  --ls-lilac-300: oklch(0.480 0.090 300);
+  --ls-lilac-400: oklch(0.580 0.120 300);
+  --ls-lilac-500: oklch(0.680 0.138 300);
+  --ls-lilac-600: oklch(0.740 0.140 300);
+  --ls-lilac-700: oklch(0.800 0.132 300);
+  --ls-lilac-800: oklch(0.870 0.100 300);
+  --ls-lilac-900: oklch(0.920 0.060 300);
+
+  --ls-amber-500: oklch(0.820 0.140 75);
+  --ls-amber-600: oklch(0.760 0.140 70);
+
+  --ls-shadow-xs: 0 1px 0 oklch(0.100 0.020 300 / 0.28);
+  --ls-shadow-sm: 0 1px 2px oklch(0.100 0.020 300 / 0.32),
+                  0 1px 0  oklch(0.100 0.020 300 / 0.24);
+  --ls-shadow-md: 0 2px 4px  oklch(0.100 0.020 300 / 0.36),
+                  0 6px 16px oklch(0.100 0.020 300 / 0.44);
+  --ls-shadow-lg: 0 4px 10px  oklch(0.100 0.020 300 / 0.40),
+                  0 18px 36px oklch(0.100 0.020 300 / 0.54);
+
+  /* Re-map QWC2 tokens for dark */
+  --text-color:               var(--ls-ink);
+  --text-color-hover:         var(--ls-lilac-500);
+  --text-color-link:          var(--ls-lilac-500);
+  --text-color-disabled:      var(--ls-ink-40);
+
+  --background-color:         var(--ls-canvas);
+  --container-bg-color:       var(--ls-surface);
+  --input-bg-color:           var(--ls-raised);
+  --input-bg-color-disabled:  var(--ls-ink-20);
+
+  --border-color:             var(--ls-rule);
+  --hover-color:              var(--ls-lilac-100);
+  --color-active:             var(--ls-lilac-500);
+  --focus-color:              var(--ls-lilac-400);
+  --focus-outline:            2px solid var(--ls-lilac-400);
+
+  --tooltip-bg-color:         var(--ls-ink);
+  --tooltip-text-color:       var(--ls-canvas);
+  --tooltip-border-color:     var(--ls-ink-70);
+
+  --map-button-bg-color:            var(--ls-raised);
+  --map-button-text-color:          var(--ls-ink-70);
+  --map-button-hover-bg-color:      var(--ls-lilac-400);
+  --map-button-hover-text-color:    var(--ls-canvas);
+  --map-button-active-bg-color:     var(--ls-amber-500);
+  --map-button-active-text-color:   var(--ls-canvas);
+
+  --panel-bg-color:           var(--ls-surface);
+  --panel-text-color:         var(--ls-ink);
+
+  --title-background-color:   oklch(0.340 0.060 300);
+  --title-text-color:         var(--ls-ink);
+  --titlebar-bg-color:        oklch(0.340 0.060 300);
+  --titlebar-text-color:      var(--ls-ink);
+
+  --button-bg-color:                  var(--ls-raised);
+  --button-bg-color-hover:            var(--ls-lilac-100);
+  --button-bg-color-active:           var(--ls-lilac-400);
+  --button-bg-color-active-hover:     var(--ls-lilac-500);
+  --button-bg-color-disabled:         var(--ls-ink-20);
+  --button-text-color:                var(--ls-ink);
+  --button-text-color-hover:          var(--ls-lilac-600);
+  --button-text-color-active:         var(--ls-canvas);
+  --button-text-color-active-hover:   var(--ls-canvas);
+  --button-text-color-disabled:       var(--ls-ink-40);
+
+  --list-bg-color:                        var(--ls-surface);
+  --list-section-bg-color:                var(--ls-lilac-100);
+  --list-section-bg-color-hover:          var(--ls-lilac-200);
+  --list-section-text-color:              var(--ls-lilac-700);
+  --list-item-bg-color-even:              var(--ls-tint);
+  --list-item-bg-color-hover:             var(--ls-lilac-100);
+  --list-item-bg-color-active:            var(--ls-lilac-400);
+  --list-item-bg-color-active-hover:      var(--ls-lilac-500);
+  --list-item-text-color-hover:           var(--ls-ink);
+  --list-item-text-color-active:          var(--ls-canvas);
+  --list-item-text-color-active-hover:    var(--ls-canvas);
+
+  --app-menu-bg-color:            var(--ls-surface);
+  --app-menu-text-color:          var(--ls-ink);
+  --app-menu-bg-color-hover:      var(--ls-lilac-100);
+  --app-menu-text-color-hover:    var(--ls-lilac-600);
+  --app-submenu-bg-color:         var(--ls-lilac-50);
+  --app-submenu-bg-color-hover:   var(--ls-lilac-100);
+  --app-submenu-text-color:       var(--ls-ink);
+  --app-submenu-text-color-hover: var(--ls-lilac-700);
+
+  --ol-brand-color:               var(--ls-lilac-500);
+  --ol-background-color:          var(--ls-surface);
+  --ol-foreground-color:          var(--ls-ink);
+  --ol-subtle-background-color:   var(--ls-tint);
+  --ol-subtle-foreground-color:   var(--ls-ink-70);
+  --ol-accent-background-color:   var(--ls-lilac-100);
+  --ol-partial-background-color:  oklch(0.230 0.020 300 / 0.72);
+}
+
+html.color-scheme-dark body,
+:root.dark body { background: var(--ls-canvas); color: var(--ls-ink); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   HIGH CONTRAST — AAA where practical, bold rules, thick focus rings
+   ═══════════════════════════════════════════════════════════════════ */
+html.color-scheme-highcontrast, :root.highcontrast {
+  color-scheme: light;
+
+  --ls-canvas:   #ffffff;
+  --ls-surface:  #ffffff;
+  --ls-raised:   #ffffff;
+  --ls-tint:     #f5f5f5;
+
+  --ls-ink:      #000000;
+  --ls-ink-90:   #0b0b0b;
+  --ls-ink-70:   #1a1a1a;
+  --ls-ink-60:   #2a2a2a;
+  --ls-ink-50:   #3a3a3a;
+  --ls-ink-40:   #555555;
+  --ls-ink-30:   #6b6b6b;
+  --ls-ink-20:   #9a9a9a;
+  --ls-ink-10:   #d9d9d9;
+
+  --ls-rule:      #000000;
+  --ls-rule-soft: #000000;
+  --ls-rule-bold: #000000;
+
+  --ls-lilac-50:  #f0e8ff;
+  --ls-lilac-100: #e0d0ff;
+  --ls-lilac-200: #b89cff;
+  --ls-lilac-300: #8a5df0;
+  --ls-lilac-400: #5d2bcc;
+  --ls-lilac-500: #3e0ca8;
+  --ls-lilac-600: #2a0782;
+  --ls-lilac-700: #1c0560;
+  --ls-lilac-800: #11033d;
+  --ls-lilac-900: #08011e;
+
+  --ls-amber-500: #c46400;
+  --ls-amber-600: #a05200;
+
+  --text-color:           var(--ls-ink);
+  --text-color-link:      var(--ls-lilac-700);
+  --text-color-disabled:  var(--ls-ink-40);
+  --border-color:         var(--ls-ink);
+
+  --color-active:         var(--ls-lilac-700);
+  --focus-outline:        3px solid var(--ls-amber-500);
+
+  --title-background-color: var(--ls-ink);
+  --title-text-color:       var(--ls-canvas);
+  --titlebar-bg-color:      var(--ls-ink);
+  --titlebar-text-color:    var(--ls-canvas);
+
+  --button-bg-color-active:       var(--ls-lilac-700);
+  --button-text-color-active:     #ffffff;
+
+  --map-button-hover-bg-color:    var(--ls-lilac-700);
+  --map-button-hover-text-color:  #ffffff;
+  --map-button-active-bg-color:   var(--ls-amber-500);
+  --map-button-active-text-color: #ffffff;
+}
+html.color-scheme-highcontrast *,
+:root.highcontrast * { border-color: var(--ls-ink) !important; }
+html.color-scheme-highcontrast input, :root.highcontrast input,
+html.color-scheme-highcontrast button, :root.highcontrast button,
+html.color-scheme-highcontrast select, :root.highcontrast select,
+html.color-scheme-highcontrast textarea, :root.highcontrast textarea {
+  border-width: 2px !important;
 }

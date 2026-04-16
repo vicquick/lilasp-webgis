@@ -1,500 +1,690 @@
-/* LILASp WebGIS — BIM Teal Theme */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+/* ═══════════════════════════════════════════════════════════════════
+   LILASp WebGIS — cartographic editorial theme
+   Fraunces (display serif) + Geist (sans) + Geist Mono (technical)
+   Lilac primary, amber accent, warm paper canvas.
+   ═══════════════════════════════════════════════════════════════════ */
 
-/* ─── Brand palette (BIM teal) ─────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap');
+
 :root {
-  --ls-teal-950: #02373d;
-  --ls-teal-900: #03494f;
-  --ls-teal-800: #045863;
-  --ls-teal-700: #066d7a;
-  --ls-teal-600: #0a8394;
-  --ls-teal-500: #3a8a96;
-  --ls-teal-400: #5e9aa8;
-  --ls-teal-300: #7bb8c4;
-  --ls-teal-200: #a8d4dc;
-  --ls-teal-100: #d0ecf0;
-  --ls-teal-50:  #e8f4f6;
+  /* ── Lilac palette (OKLCH, perceptually uniform) ─────────────── */
+  --ls-lilac-50:  oklch(0.975 0.012 300);
+  --ls-lilac-100: oklch(0.945 0.024 300);
+  --ls-lilac-200: oklch(0.885 0.052 300);
+  --ls-lilac-300: oklch(0.780 0.088 300);
+  --ls-lilac-400: oklch(0.660 0.118 300);
+  --ls-lilac-500: oklch(0.570 0.138 300);
+  --ls-lilac-600: oklch(0.500 0.142 300);
+  --ls-lilac-700: oklch(0.420 0.128 300);
+  --ls-lilac-800: oklch(0.340 0.100 300);
+  --ls-lilac-900: oklch(0.260 0.070 300);
+  --ls-lilac-950: oklch(0.180 0.050 300);
 
-  --ls-gold-700: #cc8400;
-  --ls-gold-600: #e09200;
-  --ls-gold-500: #ffb300;
-  --ls-gold-400: #ffc940;
+  /* ── Amber accent (cartographic highlighter) ─────────────────── */
+  --ls-amber-500: oklch(0.780 0.140 75);
+  --ls-amber-600: oklch(0.680 0.140 70);
+  --ls-amber-700: oklch(0.580 0.128 65);
 
-  --ls-ink:      #0d1117;
-  --ls-ink-700:  #1c2128;
-  --ls-ink-600:  #21262d;
-  --ls-ink-500:  #4a5568;
-  --ls-ink-400:  #6b7280;
-  --ls-ink-300:  #9ca3af;
-  --ls-ink-200:  #d1d5db;
-  --ls-ink-100:  #e9ecef;
-  --ls-ink-50:   #f6f8f8;
-  --ls-surface:  #fafcfc;
+  /* ── Ink (tinted violet so text feels cohesive, not dead grey) ─ */
+  --ls-ink:      oklch(0.215 0.018 300);
+  --ls-ink-90:   oklch(0.300 0.016 300);
+  --ls-ink-70:   oklch(0.400 0.014 300);
+  --ls-ink-60:   oklch(0.500 0.010 300);
+  --ls-ink-50:   oklch(0.580 0.008 300);
+  --ls-ink-40:   oklch(0.680 0.006 300);
+  --ls-ink-30:   oklch(0.780 0.006 300);
+  --ls-ink-20:   oklch(0.880 0.006 300);
+  --ls-ink-10:   oklch(0.940 0.008 300);
 
-  --ls-border:        rgba(4, 88, 99, 0.10);
-  --ls-border-strong: rgba(4, 88, 99, 0.20);
-  --ls-shadow-sm: 0 1px 3px rgba(4, 88, 99, 0.12);
-  --ls-shadow-md: 0 4px 12px rgba(4, 88, 99, 0.14);
-  --ls-shadow-lg: 0 8px 28px rgba(4, 88, 99, 0.18);
+  /* ── Surfaces (warm paper, never pure white) ─────────────────── */
+  --ls-canvas:   oklch(0.985 0.006 85);
+  --ls-surface:  oklch(0.995 0.003 85);
+  --ls-raised:   #ffffff;
+  --ls-tint:     oklch(0.970 0.012 300);
 
-  --ls-font:      'DM Sans', system-ui, -apple-system, sans-serif;
-  --ls-radius:    4px;
-  --ls-radius-md: 6px;
+  /* ── Rules ───────────────────────────────────────────────────── */
+  --ls-rule:      oklch(0.900 0.010 300);
+  --ls-rule-soft: oklch(0.940 0.008 300);
+  --ls-rule-bold: oklch(0.820 0.016 300);
+
+  /* ── Feedback ────────────────────────────────────────────────── */
+  --ls-err:      oklch(0.560 0.180 25);
+  --ls-ok:       oklch(0.580 0.140 155);
+  --ls-warn:     oklch(0.700 0.150 65);
+
+  /* ── Shadows (tinted lilac, never pure black) ────────────────── */
+  --ls-shadow-xs: 0 1px 0 oklch(0.260 0.070 300 / 0.04);
+  --ls-shadow-sm: 0 1px 2px oklch(0.260 0.070 300 / 0.06),
+                  0 1px 0  oklch(0.260 0.070 300 / 0.04);
+  --ls-shadow-md: 0 2px 4px  oklch(0.260 0.070 300 / 0.06),
+                  0 6px 16px oklch(0.260 0.070 300 / 0.10);
+  --ls-shadow-lg: 0 4px 10px  oklch(0.260 0.070 300 / 0.08),
+                  0 18px 36px oklch(0.260 0.070 300 / 0.14);
+
+  /* ── Type ─────────────────────────────────────────────────────── */
+  --ls-font-display: 'Fraunces', Georgia, 'Iowan Old Style', serif;
+  --ls-font-sans:    'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ls-font-mono:    'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* ── Radii ────────────────────────────────────────────────────── */
+  --ls-radius-xs: 3px;
+  --ls-radius-sm: 4px;
+  --ls-radius:    6px;
   --ls-radius-lg: 10px;
 
-  /* ─── QWC2 CSS variables ────────────────────────────────────── */
-  --text-color:              var(--ls-ink);
-  --text-color-link:         var(--ls-teal-700);
-  --text-color-disabled:     var(--ls-ink-300);
-  --container-bg-color:      var(--ls-surface);
-  --input-bg-color:          #fff;
-  --input-bg-color-disabled: var(--ls-ink-50);
-  --border-color:            var(--ls-border);
-  --color-active:            var(--ls-teal-800);
-  --focus-outline:           2px solid var(--ls-teal-500);
+  /* ── QWC2 token map ──────────────────────────────────────────── */
+  --font-family:              var(--ls-font-sans);
+  --font-family-mono:         var(--ls-font-mono);
+  --font-size:                14px;
+  --input-font-size:          14px;
 
-  --tooltip-bg-color:        var(--ls-ink-700);
-  --tooltip-text-color:      #fff;
-  --tooltip-border-color:    var(--ls-teal-800);
+  --text-color:               var(--ls-ink);
+  --text-color-hover:         var(--ls-lilac-700);
+  --text-color-link:          var(--ls-lilac-700);
+  --text-color-disabled:      var(--ls-ink-40);
 
-  --map-button-bg-color:          #fff;
-  --map-button-text-color:        var(--ls-teal-800);
-  --map-button-hover-bg-color:    var(--ls-teal-800);
-  --map-button-hover-text-color:  #fff;
-  --map-button-active-bg-color:   var(--ls-gold-500);
-  --map-button-active-text-color: var(--ls-ink);
+  --background-color:         var(--ls-canvas);
+  --container-bg-color:       var(--ls-surface);
+  --input-bg-color:           var(--ls-raised);
+  --input-bg-color-disabled:  var(--ls-ink-10);
 
-  --panel-bg-color:   rgba(250, 252, 252, 0.94);
-  --panel-text-color: var(--ls-ink);
+  --border-color:             var(--ls-rule);
+  --widget-border-radius:     var(--ls-radius-sm);
+  --widget-color:             var(--ls-ink);
+  --widget-height:            32px;
+  --widget-padding:           6px 10px;
+  --checkbox-size:            16px;
 
-  --titlebar-bg-color:   var(--ls-teal-800);
-  --titlebar-text-color: #fff;
+  --color-active:             var(--ls-lilac-700);
+  --focus-color:              var(--ls-lilac-500);
+  --focus-outline:            2px solid var(--ls-lilac-500);
+  --hover-color:              var(--ls-lilac-50);
 
-  --button-bg-color:              #fff;
-  --button-bg-color-hover:        var(--ls-teal-50);
-  --button-bg-color-active:       var(--ls-teal-800);
-  --button-bg-color-active-hover: var(--ls-teal-700);
-  --button-bg-color-disabled:     var(--ls-ink-50);
-  --button-text-color:            var(--ls-ink);
-  --button-text-color-hover:      var(--ls-teal-800);
-  --button-text-color-active:     #fff;
-  --button-text-color-active-hover: #fff;
-  --button-text-color-disabled:   var(--ls-ink-300);
+  /* ── Tooltip ──────────────────────────────────────────────────── */
+  --tooltip-bg-color:         var(--ls-ink);
+  --tooltip-text-color:       var(--ls-surface);
+  --tooltip-border-color:     var(--ls-ink);
 
-  --list-bg-color:                     #fff;
-  --list-section-bg-color:             var(--ls-teal-800);
-  --list-section-text-color:           #fff;
-  --list-item-bg-color-even:           var(--ls-teal-50);
-  --list-item-bg-color-hover:          var(--ls-teal-100);
-  --list-item-bg-color-active:         var(--ls-teal-800);
-  --list-item-bg-color-active-hover:   var(--ls-teal-700);
-  --list-item-text-color-hover:        var(--ls-ink);
-  --list-item-text-color-active:       #fff;
-  --list-item-text-color-active-hover: #fff;
+  /* ── Map buttons (bottom-right stack) ────────────────────────── */
+  --map-button-bg-color:            var(--ls-raised);
+  --map-button-text-color:          var(--ls-ink-70);
+  --map-button-hover-bg-color:      var(--ls-lilac-700);
+  --map-button-hover-text-color:    var(--ls-surface);
+  --map-button-active-bg-color:     var(--ls-amber-500);
+  --map-button-active-text-color:   var(--ls-ink);
 
-  --app-menu-bg-color:           #fff;
-  --app-menu-text-color:         var(--ls-ink);
-  --app-menu-bg-color-hover:     var(--ls-teal-50);
-  --app-menu-text-color-hover:   var(--ls-teal-800);
-  --app-submenu-bg-color:        var(--ls-teal-800);
-  --app-submenu-text-color:      #fff;
-  --app-submenu-bg-color-hover:  var(--ls-teal-700);
-  --app-submenu-text-color-hover: #fff;
+  /* ── Panels (side dialogs, dockables) ────────────────────────── */
+  --panel-bg-color:           var(--ls-surface);
+  --panel-text-color:         var(--ls-ink);
+
+  /* ── Title bar (panel headers) ───────────────────────────────── */
+  --title-background-color:   var(--ls-lilac-800);
+  --title-text-color:         var(--ls-surface);
+  --title-height:             36px;
+  --titlebar-bg-color:        var(--ls-lilac-800);
+  --titlebar-text-color:      var(--ls-surface);
+
+  /* ── Buttons ─────────────────────────────────────────────────── */
+  --button-bg-color:                  var(--ls-raised);
+  --button-bg-color-hover:            var(--ls-lilac-50);
+  --button-bg-color-active:           var(--ls-lilac-700);
+  --button-bg-color-active-hover:     var(--ls-lilac-800);
+  --button-bg-color-disabled:         var(--ls-ink-10);
+  --button-text-color:                var(--ls-ink);
+  --button-text-color-hover:          var(--ls-lilac-800);
+  --button-text-color-active:         var(--ls-surface);
+  --button-text-color-active-hover:   var(--ls-surface);
+  --button-text-color-disabled:       var(--ls-ink-40);
+
+  /* ── Lists (layer tree, search results) ──────────────────────── */
+  --list-bg-color:                        var(--ls-surface);
+  --list-section-bg-color:                var(--ls-lilac-50);
+  --list-section-bg-color-hover:          var(--ls-lilac-100);
+  --list-section-text-color:              var(--ls-lilac-800);
+  --list-item-bg-color-even:              var(--ls-tint);
+  --list-item-bg-color-hover:             var(--ls-lilac-100);
+  --list-item-bg-color-active:            var(--ls-lilac-700);
+  --list-item-bg-color-active-hover:      var(--ls-lilac-800);
+  --list-item-text-color-hover:           var(--ls-ink);
+  --list-item-text-color-active:          var(--ls-surface);
+  --list-item-text-color-active-hover:    var(--ls-surface);
+
+  /* ── App menu (left-side portal) ─────────────────────────────── */
+  --app-menu-bg-color:            var(--ls-surface);
+  --app-menu-text-color:          var(--ls-ink);
+  --app-menu-bg-color-hover:      var(--ls-lilac-50);
+  --app-menu-text-color-hover:    var(--ls-lilac-800);
+  --app-submenu-bg-color:         var(--ls-lilac-50);
+  --app-submenu-bg-color-hover:   var(--ls-lilac-100);
+  --app-submenu-text-color:       var(--ls-ink);
+  --app-submenu-text-color-hover: var(--ls-lilac-800);
+
+  /* ── OpenLayers tokens ───────────────────────────────────────── */
+  --ol-brand-color:               var(--ls-lilac-700);
+  --ol-background-color:          var(--ls-surface);
+  --ol-foreground-color:          var(--ls-ink);
+  --ol-subtle-background-color:   var(--ls-tint);
+  --ol-subtle-foreground-color:   var(--ls-ink-70);
+  --ol-accent-background-color:   var(--ls-lilac-100);
+  --ol-partial-background-color:  oklch(0.995 0.003 85 / 0.72);
+
+  /* ── Heights ─────────────────────────────────────────────────── */
+  --topbar-height:              48px;
+  --bottombar-height:           26px;
+  --buttons-container-width:    44px;
+  --buttons-container-height:   44px;
 }
 
-/* ─── Base ──────────────────────────────────────────────────────── */
-body, #container {
-  font-family: var(--ls-font);
-  font-size: 14px;
-  line-height: 1.5;
+/* ───────────────────────────────────────────────────────────────── */
+/* Typography — set font-family on body so QWC2 inherits             */
+/* ───────────────────────────────────────────────────────────────── */
+html, body, #container, #Map {
+  font-family: var(--ls-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'ss01', 'cv11';
+  text-rendering: optimizeLegibility;
+}
+body {
+  background: var(--ls-canvas);
   color: var(--ls-ink);
 }
 
-/* ─── TopBar ────────────────────────────────────────────────────── */
-.TopBar {
-  background: var(--ls-teal-800) !important;
-  border-bottom: 1px solid var(--ls-teal-900) !important;
-  box-shadow: 0 2px 8px rgba(4, 88, 99, 0.30) !important;
-  font-family: var(--ls-font);
+/* Fraunces for display moments: panel titles, portal heading, wordmarks */
+.titlebar, .title-container, h1, h2, h3,
+.PortalHeader, .AppMenuTitle, .LoginTitle, .combo-header {
+  font-family: var(--ls-font-display);
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 60, 'opsz' 24;
+  letter-spacing: -0.01em;
 }
 
-/* QWC2 logo — invert to white on dark teal bg */
-.TopBar img.logo-img,
-.TopBar .logo-img {
-  filter: brightness(0) invert(1) !important;
-  opacity: 0.90;
-  height: 30px !important;
-  width: auto !important;
+/* Mono for readouts: scalebar, coordinates, attribute columns */
+.map-scale, .coordinates, .coordinate-display,
+.mouse-position, .MousePosition, .scalebar-labeled {
+  font-family: var(--ls-font-mono);
+  font-feature-settings: 'tnum' 1, 'cv11' 1;
+  letter-spacing: 0;
 }
 
-/* Logo container — flex so LILASp wordmark sits right of logo */
-.TopBar .logo,
-.TopBar .topbar-logo,
-.TopBar .portal-logo {
-  display: flex !important;
+/* ───────────────────────────────────────────────────────────────── */
+/* Top bar — lilac, warm, serif wordmark                             */
+/* ───────────────────────────────────────────────────────────────── */
+.TopBar, .topbar, .TopBar-container {
+  background: var(--ls-lilac-800) !important;
+  color: var(--ls-surface) !important;
+  border-bottom: 1px solid var(--ls-lilac-900);
+  box-shadow: var(--ls-shadow-sm);
+  height: var(--topbar-height) !important;
+}
+.TopBar *, .topbar * { color: inherit; }
+
+.TopBar .search-box, .searchbox-container, .SearchBox {
+  background: oklch(0.995 0.003 85 / 0.12);
+  border: 1px solid oklch(0.995 0.003 85 / 0.22);
+  color: var(--ls-surface);
+  border-radius: var(--ls-radius);
+  padding: 6px 12px;
+  transition: background .15s, border-color .15s;
+}
+.TopBar .search-box::placeholder, .SearchBox input::placeholder {
+  color: oklch(0.995 0.003 85 / 0.62);
+}
+.TopBar .search-box:focus-within,
+.SearchBox:focus-within {
+  background: oklch(0.995 0.003 85 / 0.22);
+  border-color: var(--ls-amber-500);
+}
+
+.TopBar .icon-button, .TopBar button, .TopBar .menu-button {
+  color: var(--ls-surface);
+  background: transparent;
+  border-radius: var(--ls-radius-sm);
+  transition: background .15s;
+}
+.TopBar .icon-button:hover, .TopBar button:hover {
+  background: oklch(0.995 0.003 85 / 0.14);
+}
+.TopBar .icon-button.active, .TopBar button.active {
+  background: var(--ls-amber-500);
+  color: var(--ls-ink);
+}
+
+/* Brand wordmark: left logo → LILASp text */
+.TopBar .logo, .topbar .logo {
+  height: calc(var(--topbar-height) - 14px);
+  width: auto;
+}
+.TopBar .logo-container {
+  display: flex;
   align-items: center;
-  gap: 0;
-  cursor: pointer;
+  gap: 12px;
+  padding: 0 16px;
 }
-
-/* LILASp wordmark injected after the QWC2 logo */
-.TopBar .logo::after,
-.TopBar .topbar-logo::after,
-.TopBar .portal-logo::after {
+.TopBar .logo-container::after {
   content: 'LILASp';
-  font-family: var(--ls-font);
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.92);
-  margin-left: 10px;
-  padding-left: 10px;
-  border-left: 1px solid rgba(255, 255, 255, 0.22);
-  white-space: nowrap;
+  font-family: var(--ls-font-display);
+  font-size: 18px;
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 80, 'opsz' 20;
+  font-style: italic;
+  letter-spacing: -0.015em;
+  color: var(--ls-surface);
+  border-left: 1px solid oklch(0.995 0.003 85 / 0.22);
+  padding-left: 12px;
   line-height: 1;
-  display: block;
 }
 
-/* TopBar icons and toolbar items */
-.TopBar button,
-.TopBar .toolbar-item,
-.TopBar .task-bar-button {
-  color: rgba(255, 255, 255, 0.85) !important;
-  border-radius: var(--ls-radius) !important;
-  transition: background 0.12s ease, color 0.12s ease;
-}
-.TopBar button:hover,
-.TopBar .toolbar-item:hover,
-.TopBar .task-bar-button:hover {
-  background: rgba(255, 255, 255, 0.14) !important;
-  color: #fff !important;
-}
-.TopBar button.active,
-.TopBar .toolbar-item.active,
-.TopBar .task-bar-button.active {
-  background: var(--ls-gold-500) !important;
-  color: var(--ls-ink) !important;
-}
-
-/* Search box */
-.TopBar .SearchBox input,
-.TopBar .searchbox input,
-.TopBar input[type="text"] {
-  background: rgba(255, 255, 255, 0.13) !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
-  border-radius: var(--ls-radius-md) !important;
-  color: #fff !important;
-  font-family: var(--ls-font);
-  transition: all 0.12s ease;
-}
-.TopBar .SearchBox input::placeholder,
-.TopBar input[type="text"]::placeholder {
-  color: rgba(255, 255, 255, 0.50);
-}
-.TopBar .SearchBox input:focus,
-.TopBar input[type="text"]:focus {
-  background: rgba(255, 255, 255, 0.20) !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Search results dropdown */
-.SearchBox .searchbar-results,
-.searchbox-results {
-  background: #fff;
-  border: 1px solid var(--ls-border-strong);
-  border-radius: var(--ls-radius-md);
-  box-shadow: var(--ls-shadow-lg);
-}
-.SearchBox .searchbar-result:hover,
-.searchbox-results li:hover {
-  background: var(--ls-teal-50);
-  color: var(--ls-teal-800);
-}
-
-/* ─── BottomBar ─────────────────────────────────────────────────── */
-.BottomBar {
-  background: rgba(250, 252, 252, 0.94) !important;
-  border-top: 1px solid var(--ls-border) !important;
-  backdrop-filter: blur(8px);
-  font-family: var(--ls-font);
-  font-size: 11.5px;
-  font-variant-numeric: tabular-nums;
-  color: var(--ls-ink-400);
-}
-.BottomBar a {
-  color: var(--ls-teal-600);
-  text-decoration: none;
-}
-.BottomBar a:hover {
-  color: var(--ls-teal-800);
-}
-
-/* ─── Map buttons ───────────────────────────────────────────────── */
-.ButtonBar .map-button,
-.map-button {
-  background: #fff !important;
-  border: 1px solid var(--ls-border) !important;
-  box-shadow: var(--ls-shadow-sm) !important;
-  color: var(--ls-teal-800) !important;
-  border-radius: var(--ls-radius-md) !important;
-  transition: all 0.12s ease;
-}
-.ButtonBar .map-button:hover,
-.map-button:hover {
-  background: var(--ls-teal-800) !important;
-  border-color: var(--ls-teal-800) !important;
-  color: #fff !important;
-  box-shadow: var(--ls-shadow-md) !important;
-  transform: translateY(-1px);
-}
-.map-button.active,
-.ButtonBar .map-button.active {
-  background: var(--ls-gold-500) !important;
-  border-color: var(--ls-gold-600) !important;
-  color: var(--ls-ink) !important;
-}
-
-/* ─── SideBar ───────────────────────────────────────────────────── */
-.SideBar {
+/* ───────────────────────────────────────────────────────────────── */
+/* Bottom bar — mono readouts                                         */
+/* ───────────────────────────────────────────────────────────────── */
+.BottomBar, .bottombar {
   background: var(--ls-surface);
-  border-right: 1px solid var(--ls-border);
-  box-shadow: var(--ls-shadow-md);
+  color: var(--ls-ink-60);
+  font-family: var(--ls-font-mono);
+  font-size: 11px;
+  border-top: 1px solid var(--ls-rule-soft);
+  height: var(--bottombar-height);
+  letter-spacing: 0.02em;
 }
-.SideBar .sidebar-title,
-.sidebar-title {
-  background: var(--ls-teal-800);
-  color: #fff;
-  font-family: var(--ls-font);
-  font-weight: 600;
+.BottomBar a, .bottombar a { color: var(--ls-ink-60); }
+.BottomBar a:hover, .bottombar a:hover { color: var(--ls-lilac-700); }
+
+/* ───────────────────────────────────────────────────────────────── */
+/* Map buttons (bottom-right stack) — paper buttons with lilac hover  */
+/* ───────────────────────────────────────────────────────────────── */
+.map-button, .ZoomButton, .HomeButton, .LocateButton, .BackgroundSwitcher {
+  background: var(--map-button-bg-color) !important;
+  color: var(--map-button-text-color) !important;
+  border: 1px solid var(--ls-rule);
+  border-radius: var(--ls-radius);
+  box-shadow: var(--ls-shadow-sm);
+  width: var(--buttons-container-width);
+  height: var(--buttons-container-height);
+  transition: background .15s, color .15s, border-color .15s, transform .1s;
+}
+.map-button:hover, .ZoomButton:hover, .HomeButton:hover, .LocateButton:hover {
+  background: var(--map-button-hover-bg-color) !important;
+  color: var(--map-button-hover-text-color) !important;
+  border-color: var(--ls-lilac-700);
+}
+.map-button:active { transform: translateY(1px); }
+.map-button.active, .LocateButton.following {
+  background: var(--map-button-active-bg-color) !important;
+  color: var(--map-button-active-text-color) !important;
+  border-color: var(--ls-amber-700);
 }
 
-/* ─── Resizable windows / dialogs ───────────────────────────────── */
-.ResizableWindow,
-.resizable-window {
+/* ───────────────────────────────────────────────────────────────── */
+/* Panels / side dialogs                                              */
+/* ───────────────────────────────────────────────────────────────── */
+.resizeable-window, .ResizeableWindow, .sidebar, .right-panel {
+  background: var(--panel-bg-color);
+  color: var(--panel-text-color);
+  box-shadow: var(--ls-shadow-lg);
+  border: 1px solid var(--ls-rule);
   border-radius: var(--ls-radius-lg);
   overflow: hidden;
-  box-shadow: var(--ls-shadow-lg);
-  border: 1px solid var(--ls-border);
-}
-.ResizableWindow .resizablewindow-title,
-.resizablewindow-title,
-.ResizableWindow-titlebar,
-.dialog-title {
-  background: var(--ls-teal-800) !important;
-  color: #fff !important;
-  font-family: var(--ls-font);
-  font-weight: 600;
-}
-.ResizableWindow .resizablewindow-body,
-.resizablewindow-body {
-  background: var(--ls-surface);
 }
 
-/* ─── Forms & inputs ────────────────────────────────────────────── */
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="number"],
-input[type="search"],
-select,
-textarea {
-  font-family: var(--ls-font);
-  border: 1px solid var(--ls-border-strong);
-  border-radius: var(--ls-radius);
-  background: #fff;
-  color: var(--ls-ink);
-  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+.titlebar, .resizeable-window-titlebar, .sidebar-titlebar {
+  background: var(--title-background-color);
+  color: var(--title-text-color);
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  border-bottom: 1px solid var(--ls-lilac-900);
+  min-height: var(--title-height);
+  display: flex;
+  align-items: center;
 }
-input[type="text"]:focus,
-input[type="password"]:focus,
-input[type="email"]:focus,
-input[type="number"]:focus,
-select:focus,
-textarea:focus {
-  border-color: var(--ls-teal-500) !important;
-  box-shadow: 0 0 0 3px rgba(4, 88, 99, 0.12) !important;
+.titlebar .close, .titlebar .icon-button {
+  color: var(--ls-surface);
+  opacity: 0.8;
+  transition: opacity .15s;
+}
+.titlebar .close:hover { opacity: 1; }
+
+/* ───────────────────────────────────────────────────────────────── */
+/* Inputs — paper feel, clear focus ring                              */
+/* ───────────────────────────────────────────────────────────────── */
+input, select, textarea, .combo, .react-select__control {
+  font-family: inherit;
+  font-size: var(--input-font-size);
+  background: var(--input-bg-color);
+  color: var(--ls-ink);
+  border: 1px solid var(--ls-rule);
+  border-radius: var(--ls-radius-sm);
+  padding: var(--widget-padding);
+  transition: border-color .15s, box-shadow .15s;
+}
+input:hover, select:hover, textarea:hover { border-color: var(--ls-lilac-300); }
+input:focus, select:focus, textarea:focus,
+.react-select__control--is-focused {
   outline: none;
+  border-color: var(--ls-lilac-500);
+  box-shadow: 0 0 0 3px oklch(0.570 0.138 300 / 0.15);
+}
+input:disabled, select:disabled, textarea:disabled {
+  background: var(--input-bg-color-disabled);
+  color: var(--ls-ink-40);
+  cursor: not-allowed;
 }
 
-/* ─── LayerTree ─────────────────────────────────────────────────── */
-.LayerTree,
-.layertree {
-  font-family: var(--ls-font);
-}
-.LayerTree .layertree-item.active,
-.LayerTree .layertree-item.selected,
-.layertree-item.active,
-.layertree-item.selected {
-  background: var(--ls-teal-50);
-  border-left: 3px solid var(--ls-teal-800);
-}
-.LayerTree .layertree-item:hover,
-.layertree-item:hover {
-  background: var(--ls-teal-50);
-}
-
-/* ─── FeatureForm / Editing ─────────────────────────────────────── */
-.FeatureForm,
-.Editing,
-.feature-form {
-  font-family: var(--ls-font);
-}
-.FeatureForm label,
-.Editing label,
-.feature-form label {
-  color: var(--ls-ink-400);
-  font-size: 11.5px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: 3px;
-}
-.FeatureForm input,
-.FeatureForm select,
-.FeatureForm textarea {
-  border: 1px solid var(--ls-border-strong);
-  border-radius: var(--ls-radius);
-  background: #fff;
-  font-family: var(--ls-font);
-}
-.FeatureForm input:focus,
-.FeatureForm select:focus {
-  border-color: var(--ls-teal-500);
-  box-shadow: 0 0 0 3px rgba(4, 88, 99, 0.10);
-}
-
-/* ─── Identify ──────────────────────────────────────────────────── */
-.Identify,
-.identify-result {
-  font-family: var(--ls-font);
-}
-.Identify table.featureattributes td:first-child,
-.featureattributes td.identify-attr-key {
-  color: var(--ls-ink-400);
-  font-size: 11.5px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  white-space: nowrap;
-  padding-right: 12px;
-}
-
-/* ─── Login dialog ──────────────────────────────────────────────── */
-.Login,
-.login-wrapper {
-  font-family: var(--ls-font);
-}
-.Login label,
-.login-wrapper label {
-  color: var(--ls-ink-500);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: 4px;
-  margin-top: 12px;
-}
-.Login input[type="text"],
-.Login input[type="password"] {
-  border: 1px solid var(--ls-border-strong) !important;
-  border-radius: var(--ls-radius) !important;
-  background: #fff !important;
-  font-family: var(--ls-font) !important;
-  font-size: 14px !important;
-  padding: 8px 10px !important;
-  width: 100%;
-  box-sizing: border-box;
-}
-.Login input[type="text"]:focus,
-.Login input[type="password"]:focus {
-  border-color: var(--ls-teal-500) !important;
-  box-shadow: 0 0 0 3px rgba(4, 88, 99, 0.12) !important;
-  outline: none !important;
-}
-.Login button[type="submit"],
-.Login input[type="submit"],
-.Login .login-submit {
-  background: var(--ls-teal-800) !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: var(--ls-radius) !important;
-  padding: 10px 20px !important;
-  font-family: var(--ls-font) !important;
-  font-weight: 600 !important;
-  font-size: 14px !important;
-  width: 100%;
+/* Checkboxes + radios */
+input[type=checkbox], input[type=radio] {
+  appearance: none;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  border: 1px solid var(--ls-rule-bold);
+  background: var(--ls-raised);
   cursor: pointer;
-  transition: background 0.12s ease;
-  margin-top: 16px;
+  position: relative;
+  transition: background .15s, border-color .15s;
+  padding: 0;
+  vertical-align: middle;
 }
-.Login button[type="submit"]:hover,
-.Login input[type="submit"]:hover {
-  background: var(--ls-teal-700) !important;
+input[type=checkbox] { border-radius: 3px; }
+input[type=radio]    { border-radius: 50%; }
+input[type=checkbox]:checked, input[type=radio]:checked {
+  background: var(--ls-lilac-700);
+  border-color: var(--ls-lilac-700);
+}
+input[type=checkbox]:checked::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 4px;
+  width: 3px; height: 7px;
+  border: solid var(--ls-surface);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+input[type=radio]:checked::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: var(--ls-surface);
+  border-radius: 50%;
 }
 
-/* ─── Portal / Theme menu ───────────────────────────────────────── */
-.Portal,
-.portal-content {
-  font-family: var(--ls-font);
+/* ───────────────────────────────────────────────────────────────── */
+/* Buttons                                                            */
+/* ───────────────────────────────────────────────────────────────── */
+button, .button, .Button {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 7px 14px;
+  background: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: 1px solid var(--ls-rule);
+  border-radius: var(--ls-radius-sm);
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+  min-height: var(--widget-height);
 }
-.themetile:hover {
-  background: var(--ls-teal-50);
-  border-color: var(--ls-teal-300);
+button:hover, .button:hover {
+  background: var(--button-bg-color-hover);
+  color: var(--button-text-color-hover);
+  border-color: var(--ls-lilac-300);
 }
-.themetile.active {
-  border-color: var(--ls-teal-800) !important;
-  box-shadow: 0 0 0 2px rgba(4, 88, 99, 0.18);
+button:active:not(:disabled), .button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+button.pressed, button.active, .button.pressed, .button.active {
+  background: var(--button-bg-color-active);
+  color: var(--button-text-color-active);
+  border-color: var(--ls-lilac-700);
+}
+button:disabled, .button:disabled {
+  background: var(--button-bg-color-disabled);
+  color: var(--button-text-color-disabled);
+  border-color: var(--ls-rule);
+  cursor: not-allowed;
+}
+button:focus-visible, .button:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: 2px;
 }
 
-/* ─── AppMenu ───────────────────────────────────────────────────── */
-.AppMenu,
-.appmenu {
-  background: #fff;
+/* Primary button — inverted, ink-dark */
+button.primary, .button.primary, .PrimaryButton {
+  background: var(--ls-ink);
+  color: var(--ls-surface);
+  border-color: var(--ls-ink);
+}
+button.primary:hover, .button.primary:hover {
+  background: var(--ls-lilac-800);
+  border-color: var(--ls-lilac-800);
+  color: var(--ls-surface);
+}
+
+/* ───────────────────────────────────────────────────────────────── */
+/* Lists (layer tree, attribute table, theme switcher)                */
+/* ───────────────────────────────────────────────────────────────── */
+.LayerTree, .layertree, .ThemeSwitcher {
+  background: var(--list-bg-color);
+}
+.layertree-item, .LayerTreeItem, .theme-item {
+  border-bottom: 1px solid var(--ls-rule-soft);
+  transition: background .12s;
+}
+.layertree-item:nth-child(even), .LayerTreeItem:nth-child(even) {
+  background: var(--list-item-bg-color-even);
+}
+.layertree-item:hover, .LayerTreeItem:hover, .theme-item:hover {
+  background: var(--list-item-bg-color-hover);
+}
+.layertree-item.active, .LayerTreeItem.active,
+.layertree-item[data-selected=true] {
+  background: var(--list-item-bg-color-active);
+  color: var(--list-item-text-color-active);
+}
+.LayerTreeGroup-title, .layertree-section-title {
+  background: var(--list-section-bg-color);
+  color: var(--list-section-text-color);
+  font-family: var(--ls-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 6px 12px;
+  border-top: 1px solid var(--ls-rule);
+}
+
+/* ───────────────────────────────────────────────────────────────── */
+/* App menu (portal slide-out)                                        */
+/* ───────────────────────────────────────────────────────────────── */
+.AppMenu, .appmenu {
+  background: var(--app-menu-bg-color);
+  color: var(--app-menu-text-color);
+  border-right: 1px solid var(--ls-rule);
   box-shadow: var(--ls-shadow-lg);
-  border-radius: var(--ls-radius-lg);
-  font-family: var(--ls-font);
 }
-.AppMenu .appmenu-button:hover,
-.appmenu-button:hover {
-  background: var(--ls-teal-50);
-  color: var(--ls-teal-800);
+.AppMenu h1, .AppMenu h2, .appmenu-title {
+  font-family: var(--ls-font-display);
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 80, 'opsz' 40;
+  letter-spacing: -0.02em;
+  color: var(--ls-ink);
+  font-size: 28px;
+  line-height: 1.1;
 }
-.AppMenu .appmenu-button.active,
-.appmenu-button.active {
-  background: var(--ls-teal-800);
-  color: #fff;
+.AppMenu .menu-item, .appmenu-item {
+  padding: 10px 16px;
+  border-radius: var(--ls-radius-sm);
+  transition: background .12s, color .12s;
+}
+.AppMenu .menu-item:hover, .appmenu-item:hover {
+  background: var(--app-menu-bg-color-hover);
+  color: var(--app-menu-text-color-hover);
+}
+.AppMenu .submenu, .appmenu-submenu {
+  background: var(--app-submenu-bg-color);
+}
+.AppMenu .submenu .menu-item:hover,
+.appmenu-submenu .appmenu-item:hover {
+  background: var(--app-submenu-bg-color-hover);
+  color: var(--app-submenu-text-color-hover);
 }
 
-/* ─── Scrollbars ────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--ls-ink-50); }
-::-webkit-scrollbar-thumb { background: var(--ls-teal-300); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--ls-teal-500); }
+/* Menu icons — strip the heavy rounded-rect treatment, let icons breathe */
+.AppMenu .menu-item .icon, .appmenu-item .icon {
+  opacity: 0.7;
+  color: var(--ls-lilac-700);
+}
+.AppMenu .menu-item:hover .icon { opacity: 1; }
 
-/* ─── Selection ─────────────────────────────────────────────────── */
-::selection {
-  background: rgba(4, 88, 99, 0.18);
+/* ───────────────────────────────────────────────────────────────── */
+/* Scale bar + north arrow — cartographic grace                       */
+/* ───────────────────────────────────────────────────────────────── */
+.ol-scale-line, .scalebar, .MapScale {
+  background: oklch(0.995 0.003 85 / 0.88);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: var(--ls-ink);
+  font-family: var(--ls-font-mono);
+  font-size: 10.5px;
+  padding: 3px 7px;
+  border: 1px solid var(--ls-rule);
+  border-radius: var(--ls-radius-xs);
+  letter-spacing: 0.02em;
+}
+.ol-scale-line-inner {
+  border-color: var(--ls-ink-70);
   color: var(--ls-ink);
 }
 
-/* ─── Loading splash ────────────────────────────────────────────── */
-div#splash {
-  background: var(--ls-teal-800) !important;
-}
-.lds-dual-ring:after {
-  border-color: rgba(255,255,255,0.85) transparent rgba(255,255,255,0.85) transparent !important;
+/* ───────────────────────────────────────────────────────────────── */
+/* Tooltips                                                            */
+/* ───────────────────────────────────────────────────────────────── */
+.tooltip, [role=tooltip], .ol-tooltip {
+  background: var(--tooltip-bg-color);
+  color: var(--tooltip-text-color);
+  border: 1px solid var(--tooltip-border-color);
+  border-radius: var(--ls-radius-sm);
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: var(--ls-font-sans);
+  box-shadow: var(--ls-shadow-md);
+  letter-spacing: -0.005em;
 }
 
-/* ─── OpenLayers attribution ────────────────────────────────────── */
-.ol-attribution {
-  background: rgba(250, 252, 252, 0.80);
-  border-radius: var(--ls-radius);
-  font-family: var(--ls-font);
-  font-size: 11px;
-  color: var(--ls-ink-400);
+/* ───────────────────────────────────────────────────────────────── */
+/* Feature attribute tables / identify popups                         */
+/* ───────────────────────────────────────────────────────────────── */
+.identify-result, .AttributeTable, .feature-attribs {
+  font-size: 13px;
 }
-.ol-attribution a { color: var(--ls-teal-700); }
+.identify-result table, .AttributeTable table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.identify-result th, .AttributeTable th {
+  text-align: left;
+  font-family: var(--ls-font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ls-ink-60);
+  background: var(--ls-tint);
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--ls-rule);
+}
+.identify-result td, .AttributeTable td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--ls-rule-soft);
+  color: var(--ls-ink);
+  font-variant-numeric: tabular-nums;
+}
+.identify-result tr:hover, .AttributeTable tr:hover {
+  background: var(--ls-lilac-50);
+}
+
+/* ───────────────────────────────────────────────────────────────── */
+/* Modals                                                              */
+/* ───────────────────────────────────────────────────────────────── */
+.modal-overlay, .dialog-overlay {
+  background: oklch(0.180 0.050 300 / 0.48);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.modal, .dialog {
+  background: var(--ls-surface);
+  color: var(--ls-ink);
+  border: 1px solid var(--ls-rule);
+  border-radius: var(--ls-radius-lg);
+  box-shadow: var(--ls-shadow-lg);
+}
+
+/* ───────────────────────────────────────────────────────────────── */
+/* Login dialog (in-app modal, when used)                             */
+/* — the main login page is served by the auth-adapter flask template */
+/* ───────────────────────────────────────────────────────────────── */
+.login-dialog, .LoginDialog {
+  font-family: var(--ls-font-sans);
+}
+.login-dialog h1, .login-dialog .title {
+  font-family: var(--ls-font-display);
+  font-weight: 500;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  color: var(--ls-ink);
+}
+
+/* ───────────────────────────────────────────────────────────────── */
+/* Scrollbars — slim, lilac-tinted                                    */
+/* ───────────────────────────────────────────────────────────────── */
+* { scrollbar-width: thin; scrollbar-color: var(--ls-lilac-300) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: var(--ls-lilac-200);
+  border-radius: 10px;
+  border: 2px solid var(--ls-canvas);
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--ls-lilac-400); }
+
+/* ───────────────────────────────────────────────────────────────── */
+/* Selection                                                            */
+/* ───────────────────────────────────────────────────────────────── */
+::selection {
+  background: var(--ls-amber-500);
+  color: var(--ls-ink);
+}
+
+/* ───────────────────────────────────────────────────────────────── */
+/* Splash loader — cartographic compass ring                          */
+/* ───────────────────────────────────────────────────────────────── */
+#splash {
+  background:
+    radial-gradient(ellipse at 30% 20%, oklch(0.945 0.024 300) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, oklch(0.960 0.020 85) 0%, transparent 50%),
+    var(--ls-canvas) !important;
+}
+#splash .lds-dual-ring:after {
+  border-color: var(--ls-lilac-600) transparent var(--ls-lilac-300) transparent !important;
+}
+
+/* ───────────────────────────────────────────────────────────────── */
+/* Focus-visible everywhere                                           */
+/* ───────────────────────────────────────────────────────────────── */
+a:focus-visible,
+[role=button]:focus-visible,
+[tabindex]:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: 2px;
+  border-radius: var(--ls-radius-xs);
+}
+
+/* ───────────────────────────────────────────────────────────────── */
+/* Reduced motion                                                      */
+/* ───────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
