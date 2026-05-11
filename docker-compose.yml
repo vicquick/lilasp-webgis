@@ -169,7 +169,7 @@ services:
       - traefik.http.routers.planportal-web.entrypoints=https
       - traefik.http.routers.planportal-web.tls=true
       - traefik.http.routers.planportal-web.tls.certresolver=letsencrypt
-      - traefik.http.routers.planportal-web.middlewares=planportal-sec@docker,planportal-rl@docker
+      - traefik.http.routers.planportal-web.middlewares=planportal-sec@docker,planportal-rl@docker,planportal-auth@docker
       - traefik.http.services.planportal-web.loadbalancer.server.port=80
       # ── security headers middleware (HSTS preload, CSP, frame-deny) ──
       - traefik.http.middlewares.planportal-sec.headers.stsSeconds=63072000
@@ -189,6 +189,12 @@ services:
       - traefik.http.middlewares.planportal-rl.ratelimit.average=60
       - traefik.http.middlewares.planportal-rl.ratelimit.burst=120
       - traefik.http.middlewares.planportal-rl.ratelimit.period=1s
+      # ── basic-auth interim (until Authentik forward-auth replaces it) ──
+      # bcrypt hash; `$` doubled to `$$` so Coolify env templating doesn't
+      # eat it. Swap this middleware for `authentik-auth@file` once
+      # Authentik is up.
+      - traefik.http.middlewares.planportal-auth.basicauth.users=${PLANPORTAL_BASIC_AUTH_USERS}
+      - traefik.http.middlewares.planportal-auth.basicauth.realm=Planportal
 
 volumes:
   postgres-data:
