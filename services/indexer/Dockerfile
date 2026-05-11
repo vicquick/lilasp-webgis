@@ -4,19 +4,17 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1
 
-# tippecanoe (PMTiles), gdal-bin (ogr2ogr), nodejs+npm (geostyler-cli@7).
-# Use Debian Bookworm's bundled nodejs (18.19) — avoids the nodesource
-# curl/apt-key dance that flakes on the Coolify builder.
+# tippecanoe builds PMTiles, gdal's ogr2ogr handles reprojection.
+# geostyler-cli (QML → MapLibre style) is deferred to a later phase — see
+# bake.py's `style_path` fallback. Without it, vector tiles ship with
+# martin's default style; WMS is still pixel-identical for any
+# non-eligible layer.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       tippecanoe \
       gdal-bin \
-      nodejs \
-      npm \
       ca-certificates \
- && npm install -g geostyler-cli@7 \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/* /root/.npm
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

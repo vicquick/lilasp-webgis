@@ -69,23 +69,15 @@ async def bake_layer(slug: str, layer_id: str, datasource: str, qml_path: Path |
         return {"pmtiles_path": None, "style_path": None, "warnings": [f"tippecanoe: {err[:200]}"]}
     pmtiles_new.replace(pmtiles_path)
 
-    # 3) geostyler-cli QML → MapLibre style.json.
-    if qml_path and qml_path.exists():
-        code, _, err = await _run(
-            [
-                "geostyler-cli",
-                "-s", "qml",
-                "-t", "mapbox",
-                "-o", str(style_path),
-                str(qml_path),
-            ]
-        )
-        if code != 0:
-            warnings.append(f"geostyler-cli: {err[:200]}")
-            style_path = None
+    # geostyler-cli (QML → MapLibre style) is intentionally NOT installed
+    # in the indexer image — see Dockerfile. Vector tiles ship without a
+    # custom style for now; WMS fallback covers high-fidelity rendering.
+    # When geostyler-cli is added back, restore the subprocess call here.
+    style_path = None
+    if qml_path is None or not qml_path.exists():
+        warnings.append("no QML alongside layer — martin default style")
     else:
-        style_path = None
-        warnings.append("no QML alongside layer — using martin default style")
+        warnings.append("style baking deferred (geostyler-cli not installed)")
 
     # Drop the intermediate GeoJSON.
     geojson_path.unlink(missing_ok=True)
