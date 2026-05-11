@@ -1,4 +1,4 @@
-FROM 3liz/qgis-map-server:1.9.6
+FROM 3liz/qgis-map-server:3.44.8-1.9.6
 
 USER root
 
