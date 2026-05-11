@@ -67,8 +67,16 @@ def parse_qgs(qgs_path: Path, *, slug: str | None = None) -> ProjectMeta:
     crs = _findtext(crs_el, "authid") or "EPSG:25832"
 
     bbox: tuple[float, float, float, float] | None = None
-    ext = root.find("./ProjectViewSettings/Extent")
-    if ext is not None:
+    # Different QGIS versions put the extent in different places. Try
+    # newest (ProjectViewSettings) → mapcanvas (3.x classic) → top-level.
+    for xpath in (
+        "./ProjectViewSettings/Extent",
+        ".//mapcanvas/extent",
+        "./extent",
+    ):
+        ext = root.find(xpath)
+        if ext is None:
+            continue
         try:
             bbox = (
                 float(ext.findtext("xmin", "0") or 0),
@@ -76,8 +84,12 @@ def parse_qgs(qgs_path: Path, *, slug: str | None = None) -> ProjectMeta:
                 float(ext.findtext("xmax", "0") or 0),
                 float(ext.findtext("ymax", "0") or 0),
             )
-        except ValueError:
+        except (ValueError, TypeError):
             bbox = None
+        # Reject all-zero extents
+        if bbox and any(c != 0 for c in bbox):
+            break
+        bbox = None
 
     layers: list[Layer] = []
     for ml in root.findall("./projectlayers/maplayer"):

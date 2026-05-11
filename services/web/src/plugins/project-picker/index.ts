@@ -1,5 +1,4 @@
-// Project picker — minimal grid of buttons from services.json. Selecting one
-// emits a `planportal:project` event which app.ts listens for.
+// Project picker — card list in the left sidebar.
 
 import type { ServiceProject } from '../../lib/services-loader';
 
@@ -7,20 +6,28 @@ export function mountProjectPicker(
   container: HTMLElement,
   projects: ServiceProject[],
   currentSlug: string | null,
+  countEl?: HTMLElement | null,
 ): void {
-  container.innerHTML =
-    '<h2>Projekte</h2>' +
-    projects
-      .map(
-        (p) =>
-          `<button class="project-picker__item${p.slug === currentSlug ? ' project-picker__item--active' : ''}" data-slug="${p.slug}">` +
-          `<strong>${p.title}</strong><br/><small>${p.layers.length} Layer · ${p.themes.length} Themen</small>` +
-          `</button>`,
-      )
-      .join('');
+  if (countEl) countEl.textContent = `${projects.length}`;
+  if (!projects.length) {
+    container.innerHTML = '<div class="layer-tree__empty">Keine Projekte. Lege ein .qgz unter /srv/gis/&lt;slug&gt;/ ab.</div>';
+    return;
+  }
+  container.innerHTML = projects
+    .map((p) => {
+      const safe = p.title.replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]!);
+      const layerCount = p.layers.filter((l) => l.geom_type !== 'No geometry').length;
+      return (
+        `<button class="project-card" data-slug="${p.slug}" data-active="${p.slug === currentSlug}">` +
+        `<span class="project-card__title">${safe}</span>` +
+        `<span class="project-card__meta">${layerCount} Layer · ${p.themes.length} Themen · ${p.print_layouts.length} Drucklayouts</span>` +
+        `</button>`
+      );
+    })
+    .join('');
   container.querySelectorAll<HTMLButtonElement>('button[data-slug]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const slug = btn.dataset.slug as string;
+      const slug = btn.dataset.slug!;
       window.dispatchEvent(new CustomEvent('planportal:project', { detail: { slug } }));
     });
   });

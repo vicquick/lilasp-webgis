@@ -1,63 +1,108 @@
-import 'ol/ol.css';
-
 import { registerCRS } from './lib/crs';
 import { fetchWhoAmI } from './lib/whoami';
 import { loadServices, type ServiceProject } from './lib/services-loader';
-import { createProjectMap } from './lib/masterportal-bridge';
+import { createProjectMap, type BuiltMap } from './lib/masterportal-bridge';
 import { mountProjectPicker } from './plugins/project-picker';
-import { mountMapThemeSwitcher } from './plugins/map-theme';
-import { mountGetPrintLauncher } from './plugins/getprint';
+import { mountMapThemeSelect } from './plugins/map-theme';
+import { mountLayerTree, applyTheme } from './plugins/layer-tree';
+import { mountIdentify } from './plugins/identify';
+import { renderPrintForm, wirePrintForm } from './plugins/getprint';
+import { mountMapControls, mountCoordsReadout } from './plugins/map-controls';
 
 interface AppState {
   projects: ServiceProject[];
-  currentSlug: string | null;
+  current: ServiceProject | null;
+  builtMap: BuiltMap | null;
 }
 
-const state: AppState = { projects: [], currentSlug: null };
+const state: AppState = { projects: [], current: null, builtMap: null };
+
+const $ = (sel: string): HTMLElement => document.querySelector(sel) as HTMLElement;
+
+const inspectorApi = {
+  open(title: string, html: string): void {
+    $('#inspector-title').textContent = title;
+    $('#inspector-body').innerHTML = html;
+    $('#root').setAttribute('data-inspector', 'true');
+  },
+  close(): void {
+    $('#root').setAttribute('data-inspector', 'false');
+  },
+  setBusy(busy: boolean): void {
+    document.body.style.cursor = busy ? 'progress' : '';
+  },
+};
+
+function showInspectorPrint(): void {
+  if (!state.current || !state.builtMap) return;
+  inspectorApi.open('Drucken', renderPrintForm(state.current));
+  wirePrintForm($('#inspector-body'), state.builtMap.map, state.current);
+}
 
 
 async function selectProject(slug: string): Promise<void> {
   const project = state.projects.find((p) => p.slug === slug);
   if (!project) return;
-  state.currentSlug = slug;
+  state.current = project;
 
-  document.getElementById('project-title')!.textContent = project.title;
-  document.getElementById('map')!.innerHTML = '';
-  const map = await createProjectMap({ containerId: 'map', project });
+  $('#project-title').textContent = project.title;
+  $('#panel-themes').hidden = !project.themes.length;
+  $('#panel-layers').hidden = !project.layers.length;
 
-  mountMapThemeSwitcher(document.getElementById('map-themes')!, map, project);
-  mountGetPrintLauncher(document.getElementById('inspector')!, map, project);
-  mountProjectPicker(
-    document.getElementById('project-picker')!,
-    state.projects,
-    state.currentSlug,
+  // Dispose previous map
+  if (state.builtMap) {
+    state.builtMap.map.setTarget(undefined);
+    state.builtMap = null;
+  }
+  $('#map').innerHTML = '';
+
+  const builtMap = createProjectMap('map', project);
+  state.builtMap = builtMap;
+
+  mountLayerTree($('#layer-tree'), builtMap, project, $('#layers-count'));
+  mountMapThemeSelect($('#map-themes'), project, (themeName) =>
+    applyTheme($('#layer-tree'), builtMap, project, themeName),
   );
+  mountIdentify(builtMap.map, project, inspectorApi);
+  mountMapControls({
+    builtMap,
+    zoomEl: $('#map-tools-zoom'),
+    rightEl: $('#map-tools-right'),
+    onOpenPrint: showInspectorPrint,
+  });
+  mountCoordsReadout(builtMap.map, $('#readout-coords'), project.crs);
+
+  mountProjectPicker($('#project-picker'), state.projects, slug, $('#projects-count'));
 
   history.replaceState(null, '', `?project=${encodeURIComponent(slug)}`);
 }
 
-
 async function boot(): Promise<void> {
   registerCRS();
 
+  const userEl = $('#userinfo');
   const who = await fetchWhoAmI();
-  document.getElementById('userinfo')!.textContent = who
-    ? `${who.user} (${who.groups.length} Gruppen)`
-    : 'nicht angemeldet';
+  userEl.textContent = who ? who.user : 'admin';
 
-  const payload = await loadServices();
+  let payload;
+  try {
+    payload = await loadServices();
+  } catch (e) {
+    document.body.innerHTML = '<pre style="padding:24px;font-family:system-ui">services.json laden fehlgeschlagen: ' + String(e) + '</pre>';
+    return;
+  }
   state.projects = payload.projects;
 
-  mountProjectPicker(document.getElementById('project-picker')!, state.projects, null);
+  mountProjectPicker($('#project-picker'), state.projects, null, $('#projects-count'));
 
   window.addEventListener('planportal:project', (e) => {
     const slug = (e as CustomEvent<{ slug: string }>).detail.slug;
     void selectProject(slug);
   });
 
-  const initial = new URL(window.location.href).searchParams.get('project')
-    ?? state.projects[0]?.slug
-    ?? null;
+  $('#inspector-close').addEventListener('click', () => inspectorApi.close());
+
+  const initial = new URL(window.location.href).searchParams.get('project') ?? state.projects[0]?.slug ?? null;
   if (initial) {
     await selectProject(initial);
   }

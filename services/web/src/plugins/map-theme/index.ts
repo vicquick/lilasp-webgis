@@ -1,46 +1,29 @@
-// Map-theme switcher — mirrors QGIS <visibility-presets>.
-// The list is rendered as a <select>; switching dispatches setVisible() per layer
-// on the underlying OL map. This is the QGIS Desktop ↔ webGIS fidelity contract.
+// Map-theme dropdown. Wires to the layer-tree to toggle visibility per theme.
 
-import type { Map as OLMap } from 'ol';
-import LayerGroup from 'ol/layer/Group';
 import type { ServiceProject } from '../../lib/services-loader';
 
-export function mountMapThemeSwitcher(
+export function mountMapThemeSelect(
   container: HTMLElement,
-  map: OLMap,
   project: ServiceProject,
+  onChange: (themeName: string) => void,
 ): void {
   if (!project.themes.length) {
     container.innerHTML = '';
     return;
   }
-
+  const opts = project.themes
+    .map(
+      (t) =>
+        `<option value="${t.name}">${t.name.replace(/_/g, ' ')} (${t.visible_layer_ids.length})</option>`,
+    )
+    .join('');
   container.innerHTML =
-    '<h2>Karten-Themen</h2>' +
-    '<select id="map-theme-select">' +
-    project.themes.map((t) => `<option value="${t.name}">${t.name}</option>`).join('') +
-    '</select>';
-
+    `<select class="theme-select" id="map-theme-select">` +
+    `<option value="" disabled selected>Thema wählen…</option>` +
+    opts +
+    `</select>`;
   const select = container.querySelector('#map-theme-select') as HTMLSelectElement;
   select.addEventListener('change', () => {
-    const themeName = select.value;
-    const theme = project.themes.find((t) => t.name === themeName);
-    if (!theme) return;
-    const visible = new Set(theme.visible_layer_ids.map((id) => `${project.slug}__${id}`));
-    walkLayers(map, (layer) => {
-      const id = layer.get('id') as string | undefined;
-      if (id) layer.setVisible(visible.has(id));
-    });
-  });
-}
-
-function walkLayers(map: OLMap, fn: (l: any) => void): void {
-  map.getLayers().forEach(function visit(l) {
-    if (l instanceof LayerGroup) {
-      l.getLayers().forEach(visit);
-    } else {
-      fn(l);
-    }
+    if (select.value) onChange(select.value);
   });
 }

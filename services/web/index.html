@@ -2,24 +2,81 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Planportal — LILASp</title>
-    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#7c5cb0" />
+    <title>Planportal · LILASp</title>
+    <link rel="preconnect" href="https://rsms.me" crossorigin />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%237c5cb0'%3E%3Cpath d='M3 3l9 4 9-4-9 18z'/%3E%3C/svg%3E" />
   </head>
   <body>
-    <header class="topbar">
-      <span class="brand">Planportal</span>
-      <span class="project-title" id="project-title">—</span>
-      <span class="userinfo" id="userinfo">…</span>
-    </header>
-    <aside class="sidebar" id="sidebar">
-      <section id="project-picker"></section>
-      <section id="layer-tree"></section>
-      <section id="map-themes"></section>
-    </aside>
-    <main id="map" class="map"></main>
-    <aside class="inspector" id="inspector"></aside>
+    <div id="root" class="app">
+      <header class="topbar">
+        <div class="brand">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 3l9 4 9-4-9 18z"/></svg>
+          <span class="brand__name">Planportal</span>
+        </div>
+        <div class="topbar__divider"></div>
+        <div class="topbar__project" id="topbar-project">
+          <span class="topbar__project-label">Projekt</span>
+          <span class="topbar__project-title" id="project-title">—</span>
+        </div>
+        <div class="topbar__spacer"></div>
+        <div class="topbar__user" id="userinfo" aria-live="polite">…</div>
+      </header>
 
+      <aside class="sidebar" id="sidebar" aria-label="Navigation">
+        <section class="panel" id="panel-projects">
+          <header class="panel__head">
+            <h2 class="panel__title">Projekte</h2>
+            <span class="panel__count" id="projects-count">0</span>
+          </header>
+          <div class="panel__body" id="project-picker"></div>
+        </section>
+        <section class="panel" id="panel-themes" hidden>
+          <header class="panel__head">
+            <h2 class="panel__title">Karten-Thema</h2>
+          </header>
+          <div class="panel__body" id="map-themes"></div>
+        </section>
+        <section class="panel panel--scroll" id="panel-layers" hidden>
+          <header class="panel__head">
+            <h2 class="panel__title">Layer</h2>
+            <span class="panel__count" id="layers-count">0</span>
+          </header>
+          <div class="panel__body" id="layer-tree"></div>
+        </section>
+      </aside>
+
+      <main class="map-area" id="map-area">
+        <div id="map" class="map" role="application" aria-label="Karte"></div>
+        <div class="map-overlay map-overlay--tl">
+          <div class="map-tools map-tools--vertical" id="map-tools-zoom"></div>
+        </div>
+        <div class="map-overlay map-overlay--tr">
+          <div class="map-tools map-tools--vertical" id="map-tools-right"></div>
+        </div>
+        <div class="map-overlay map-overlay--bl">
+          <div class="readout" id="readout-scale" aria-hidden="true"></div>
+        </div>
+        <div class="map-overlay map-overlay--br">
+          <div class="readout readout--mono" id="readout-coords">—</div>
+        </div>
+        <div class="map-overlay map-overlay--toast" id="map-toast" hidden></div>
+      </main>
+
+      <aside class="inspector" id="inspector" data-open="false" aria-label="Informationen">
+        <header class="inspector__head">
+          <h2 class="inspector__title" id="inspector-title">Inspektor</h2>
+          <button class="icon-btn" id="inspector-close" aria-label="Schließen">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </header>
+        <div class="inspector__tabs" id="inspector-tabs"></div>
+        <div class="inspector__body" id="inspector-body"></div>
+      </aside>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
