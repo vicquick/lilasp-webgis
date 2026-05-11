@@ -1,3 +1,4 @@
+import './styles.css';
 import { registerCRS } from './lib/crs';
 import { fetchWhoAmI } from './lib/whoami';
 import { loadServices, type ServiceProject } from './lib/services-loader';
