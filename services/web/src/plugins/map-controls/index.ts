@@ -1,6 +1,5 @@
-// Custom map overlay controls (zoom, fit, locate, basemap switcher,
-// identify mode, print). Replaces OL's built-in zoom buttons with
-// LILASp-styled SVG icons.
+// Custom map overlay controls (zoom, fit, locate, basemap cycle,
+// print). Replaces OL's built-in zoom buttons with on-brand SVG icons.
 
 import type { Map as OLMap } from 'ol';
 import { fromLonLat, transform } from 'ol/proj';
@@ -16,6 +15,7 @@ interface ToolButton {
 
 function button(cfg: ToolButton): HTMLButtonElement {
   const b = document.createElement('button');
+  b.type = 'button';
   b.className = 'map-tools__btn';
   b.innerHTML = cfg.icon;
   b.title = cfg.title;
@@ -35,18 +35,31 @@ export interface MapControlsOptions {
 export function mountMapControls({ builtMap, zoomEl, rightEl, onOpenPrint }: MapControlsOptions): void {
   const { map } = builtMap;
   zoomEl.replaceChildren(
-    button({ icon: icons.plus(), title: 'Hineinzoomen', onClick: () => map.getView().setZoom((map.getView().getZoom() ?? 6) + 1) }),
-    button({ icon: icons.minus(), title: 'Herauszoomen', onClick: () => map.getView().setZoom((map.getView().getZoom() ?? 6) - 1) }),
-    button({ icon: icons.home(), title: 'Auf Projektausdehnung zoomen', onClick: () => builtMap.fitToProject() }),
+    button({ icon: icons.plus(),  title: 'Hineinzoomen',          onClick: () => map.getView().setZoom((map.getView().getZoom() ?? 6) + 1) }),
+    button({ icon: icons.minus(), title: 'Herauszoomen',          onClick: () => map.getView().setZoom((map.getView().getZoom() ?? 6) - 1) }),
+    button({ icon: icons.home(),  title: 'Auf Projektausdehnung zoomen', onClick: () => builtMap.fitToProject() }),
   );
 
-  let basemapKey: BasemapKey = 'carto';
-  const cycleBasemap = (btn: HTMLButtonElement) => {
-    const order: BasemapKey[] = ['carto', 'osm', 'esriSat'];
-    basemapKey = order[(order.indexOf(basemapKey) + 1) % order.length] as BasemapKey;
-    builtMap.setBasemap(basemapKey);
-    btn.title = `Basiskarte: ${basemapKey}`;
-  };
+  // Cycle: off → carto → cartoDark → osm → esriSat → off …
+  // "off" lives in the cycle because the project brief is "themes
+  // own the canvas; the basemap is opt-in scaffolding."
+  const order: (BasemapKey | null)[] = [null, 'carto', 'cartoDark', 'osm', 'esriSat'];
+  const labelOf = (k: BasemapKey | null) =>
+    k === null ? 'aus' : { carto: 'CARTO', cartoDark: 'CARTO Dark', osm: 'OSM', esriSat: 'Satellit' }[k];
+
+  const basemapBtn = button({
+    icon: icons.layers(),
+    title: `Basiskarte: ${labelOf(builtMap.getBasemap())}`,
+    onClick: (btn) => {
+      const cur = builtMap.getBasemap();
+      const idx = order.indexOf(cur);
+      const next = order[(idx + 1) % order.length] ?? null;
+      builtMap.setBasemap(next);
+      btn.title = `Basiskarte: ${labelOf(next)}`;
+      btn.setAttribute('aria-pressed', next === null ? 'false' : 'true');
+    },
+    pressed: builtMap.getBasemap() !== null,
+  });
 
   const locate = () => {
     if (!navigator.geolocation) return;
@@ -59,9 +72,9 @@ export function mountMapControls({ builtMap, zoomEl, rightEl, onOpenPrint }: Map
   };
 
   rightEl.replaceChildren(
-    button({ icon: icons.layers(), title: 'Basiskarte wechseln', onClick: cycleBasemap }),
+    basemapBtn,
     button({ icon: icons.locate(), title: 'Mein Standort', onClick: locate }),
-    button({ icon: icons.print(), title: 'Drucken (PDF)', onClick: onOpenPrint }),
+    button({ icon: icons.print(),  title: 'Drucken (PDF)', onClick: onOpenPrint }),
   );
 }
 

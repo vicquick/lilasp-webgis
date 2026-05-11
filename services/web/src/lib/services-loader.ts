@@ -1,5 +1,34 @@
 // Loads /services.json (emitted by the indexer) and exposes typed accessors.
 
+export type SymbologyKind =
+  | 'single'
+  | 'categorized'
+  | 'graduated'
+  | 'rule'
+  | 'heatmap'
+  | 'inverted'
+  | 'displacement'
+  | 'cluster'
+  | '25d'
+  | 'embedded'
+  | 'merged'
+  | 'none'
+  | 'raster'
+  | 'raster-gray'
+  | 'raster-pseudo'
+  | 'raster-color'
+  | 'raster-rgb'
+  | 'raster-paletted'
+  | 'raster-hillshade'
+  | 'raster-contour';
+
+export interface ServiceSymbology {
+  kind: SymbologyKind;
+  class_count: number;
+  primary_color: string | null;
+  attr: string | null;
+}
+
 export interface ServiceLayer {
   id: string;
   name: string;
@@ -12,6 +41,18 @@ export interface ServiceLayer {
   wfs_url: string;
   pmtiles_url: string | null;
   style_url: string | null;
+  symbology: ServiceSymbology | null;
+}
+
+export interface ServiceTreeNode {
+  kind: 'group' | 'layer';
+  name: string;
+  expanded: boolean;
+  checked: boolean;
+  /** Only for kind="layer" */
+  layer_id?: string;
+  /** Only for kind="group" */
+  children?: ServiceTreeNode[];
 }
 
 export interface ServiceTheme {
@@ -26,6 +67,7 @@ export interface ServiceProject {
   bbox: [number, number, number, number] | null;
   qgs_file?: string;
   layers: ServiceLayer[];
+  tree: ServiceTreeNode | null;
   themes: ServiceTheme[];
   print_layouts: string[];
   endpoints: { wms: string; wfs?: string; print: string };

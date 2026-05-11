@@ -20,6 +20,12 @@ export const BASEMAPS = {
     attribution: '© CARTO · © OpenStreetMap',
     maxZoom: 19,
   },
+  cartoDark: {
+    label: 'CARTO Dark Matter',
+    url: 'https://{a-d}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png',
+    attribution: '© CARTO · © OpenStreetMap',
+    maxZoom: 19,
+  },
   osm: {
     label: 'OpenStreetMap',
     url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -60,7 +66,8 @@ function buildBasemap(key: BasemapKey): TileLayer<XYZ | OSM> {
  * Build OL tile layers for every renderable QGIS layer in the project.
  * Cold-start aware:
  *   - Layers default to `visible: false` so the first paint is just the
- *     basemap (instant) and the user opts-in per layer.
+ *     basemap (or the empty canvas when basemap is off) and the user
+ *     opts-in per layer or via a map theme.
  *   - QGIS layer visibility from the .qgs is preserved in a custom
  *     property `wms-default-visible` so the map-theme switcher and
  *     layer-tree can honour it without forcing 46 simultaneous WMS
@@ -92,6 +99,8 @@ function projectLayers(project: ServiceProject): TileLayer<TileWMS>[] {
           name: layer.name,
           'layer-id': layer.id,
           'wms-default-visible': layer.wms_visible,
+          'webgis-layer': true,
+          // kept for legacy code that may still query the old key
           'planportal-layer': true,
         },
       });
@@ -103,14 +112,22 @@ const GERMANY_BBOX_4326: [number, number, number, number] = [5.5, 47.0, 15.5, 55
 
 export interface BuiltMap {
   map: Map;
-  setBasemap: (key: BasemapKey) => void;
+  setBasemap: (key: BasemapKey | null) => void;
+  getBasemap: () => BasemapKey | null;
   toggleLayer: (id: string, visible: boolean) => void;
   fitToProject: () => void;
 }
 
-export function createProjectMap(containerId: string, project: ServiceProject): BuiltMap {
-  // Project extent fallback: if .qgs had no extent, fit to a Germany-wide bbox
-  // reprojected from EPSG:4326 to the project's CRS. The user can still zoom.
+export interface CreateMapOptions {
+  /** Initial basemap key, or null for none (default: null — themes take over). */
+  basemap?: BasemapKey | null;
+}
+
+export function createProjectMap(
+  containerId: string,
+  project: ServiceProject,
+  opts: CreateMapOptions = {},
+): BuiltMap {
   let extent: [number, number, number, number] | undefined = project.bbox ?? undefined;
   if (!extent) {
     try {
@@ -127,13 +144,16 @@ export function createProjectMap(containerId: string, project: ServiceProject): 
     showFullExtent: true,
   });
 
-  const basemap = buildBasemap('carto');
+  let basemapLayer: TileLayer<XYZ | OSM> | null = null;
+  let basemapKey: BasemapKey | null = opts.basemap ?? null;
+  if (basemapKey) basemapLayer = buildBasemap(basemapKey);
+
   const wms = projectLayers(project);
 
   const map = new Map({
     target: containerId,
     view,
-    layers: [basemap, ...wms],
+    layers: basemapLayer ? [basemapLayer, ...wms] : [...wms],
     controls: defaultControls({ zoom: false, attribution: false }).extend([
       new ScaleLine({ units: 'metric' }),
       new Attribution({ collapsible: false }),
@@ -150,15 +170,30 @@ export function createProjectMap(containerId: string, project: ServiceProject): 
   return {
     map,
     setBasemap(key) {
-      basemap.setSource(buildBasemap(key).getSource() as any);
-      basemap.set('basemap-key', key);
+      if (key === null) {
+        if (basemapLayer) {
+          map.removeLayer(basemapLayer);
+          basemapLayer = null;
+        }
+        basemapKey = null;
+        return;
+      }
+      if (basemapLayer) {
+        basemapLayer.setSource(buildBasemap(key).getSource() as any);
+        basemapLayer.set('basemap-key', key);
+      } else {
+        basemapLayer = buildBasemap(key);
+        map.getLayers().insertAt(0, basemapLayer);
+      }
+      basemapKey = key;
     },
+    getBasemap() { return basemapKey; },
     toggleLayer(id, visible) {
       const lyr = map.getAllLayers().find((l) => l.get('id') === id);
       lyr?.setVisible(visible);
     },
     fitToProject() {
-      if (extent) view.fit(extent, { padding: [40, 40, 40, 40], duration: 250, maxZoom: 18 });
+      if (extent) view.fit(extent, { padding: [40, 40, 40, 40], duration: 280, maxZoom: 18 });
     },
   };
 }
