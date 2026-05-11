@@ -24,9 +24,9 @@ def _layer_dict(slug: str, layer) -> dict:
         "geom_type": layer.geom_type,
         "crs": layer.crs,
         "wms_visible": layer.wms_visible,
-        "wms_url": f"{config.PUBLIC_QGIS_BASE}/?MAP={slug}/{slug}.qgz",
+        "wms_url": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={slug}/{slug}.qgz",
         "wms_layer_name": layer.id,
-        "wfs_url": f"{config.PUBLIC_QGIS_BASE}/?MAP={slug}/{slug}.qgz",
+        "wfs_url": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={slug}/{slug}.qgz",
         # Indexer fills these after bake; default null.
         "pmtiles_url": None,
         "style_url": None,
@@ -46,8 +46,8 @@ def _project_dict(p: ProjectMeta) -> dict:
         ],
         "print_layouts": p.print_layouts,
         "endpoints": {
-            "wms": f"{config.PUBLIC_QGIS_BASE}/?MAP={p.slug}/{p.slug}.qgz",
-            "print": f"{config.PUBLIC_QGIS_BASE}/?MAP={p.slug}/{p.slug}.qgz",
+            "wms": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={p.slug}/{p.slug}.qgz",
+            "print": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={p.slug}/{p.slug}.qgz",
         },
     }
 

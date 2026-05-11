@@ -80,11 +80,18 @@ services:
 
   martin:
     image: ghcr.io/maplibre/martin:v0.18.0
-    command: ['--config', '/config/config.yaml']
+    # No config file — martin picks up DATABASE_URL from env and auto-discovers
+    # PMTiles in /srv/tiles. Coolify's file-bind handler creates dirs at the
+    # mount target when the source file is relative, which breaks martin
+    # (`Is a directory`). Stay CLI-args + env-vars for simplicity.
+    command:
+      - '--listen-addresses=0.0.0.0:3000'
+      - '--pool-size=10'
+      - '--default-srid=25832'
+      - '/srv/tiles'
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-planportal}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-planportal}
     volumes:
-      - ./services/martin/config.yaml:/config/config.yaml:ro
       - /srv/gis-staging-tiles:/srv/tiles:ro
     healthcheck:
       test: ['CMD-SHELL', 'wget -q -O- http://127.0.0.1:3000/health >/dev/null || exit 1']

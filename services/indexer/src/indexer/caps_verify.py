@@ -10,14 +10,16 @@ from . import config
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=5))
 async def verify(slug: str) -> tuple[bool, str]:
     """Returns (ok, error_message)."""
-    # MAP is resolved relative to QGSRV_CACHE_ROOTDIR (/srv/gis); the indexer
-    # discovers either a .qgs or a .qgz under <slug>/<slug>.* — try both.
+    # WMS/WFS live under /ows/ on py-qgis-server 1.9. MAP is resolved
+    # relative to QGSRV_CACHE_ROOTDIR (/srv/gis); we discover .qgz/.qgs as
+    # <slug>/<slug>.*. Bump timeout because first-load of large projects
+    # (46-layer cuxhaven) compiles all layer sources synchronously.
     map_relative = f"{slug}/{slug}.qgz"
     url = (
-        f"{config.PYQGIS_URL}/?MAP={map_relative}"
+        f"{config.PYQGIS_URL}/ows/?MAP={map_relative}"
         f"&SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0"
     )
-    async with httpx.AsyncClient(timeout=30) as client:
+    async with httpx.AsyncClient(timeout=120) as client:
         r = await client.get(url)
         if r.status_code != 200:
             return False, f"HTTP {r.status_code}: {r.text[:200]}"
