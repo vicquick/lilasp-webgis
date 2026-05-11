@@ -157,8 +157,38 @@ services:
         condition: service_started
       auth-gateway:
         condition: service_started
-    networks: [planportal]
+    networks: [planportal, coolify]
     restart: unless-stopped
+    # Public router — Authentik forward-auth added once Authentik is online.
+    # Until then, basic-auth at the Coolify level (set on the application).
+    # `$$` escapes `$` for Coolify's env-var templating.
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=coolify
+      - traefik.http.routers.planportal-web.rule=Host(`webgis.lilasp.de`)
+      - traefik.http.routers.planportal-web.entrypoints=https
+      - traefik.http.routers.planportal-web.tls=true
+      - traefik.http.routers.planportal-web.tls.certresolver=letsencrypt
+      - traefik.http.routers.planportal-web.middlewares=planportal-sec@docker,planportal-rl@docker
+      - traefik.http.services.planportal-web.loadbalancer.server.port=80
+      # ── security headers middleware (HSTS preload, CSP, frame-deny) ──
+      - traefik.http.middlewares.planportal-sec.headers.stsSeconds=63072000
+      - traefik.http.middlewares.planportal-sec.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.planportal-sec.headers.stsPreload=true
+      - traefik.http.middlewares.planportal-sec.headers.forceSTSHeader=true
+      - traefik.http.middlewares.planportal-sec.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.planportal-sec.headers.browserXssFilter=true
+      - traefik.http.middlewares.planportal-sec.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.planportal-sec.headers.frameDeny=true
+      - traefik.http.middlewares.planportal-sec.headers.contentSecurityPolicy=default-src 'self'; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://webgis.lilasp.de; font-src 'self' data:; frame-ancestors 'none'
+      - traefik.http.middlewares.planportal-sec.headers.permissionsPolicy=camera=(), microphone=(), geolocation=(self), interest-cohort=()
+      - traefik.http.middlewares.planportal-sec.headers.customResponseHeaders.X-Permitted-Cross-Domain-Policies=none
+      - traefik.http.middlewares.planportal-sec.headers.customResponseHeaders.X-Robots-Tag=noindex, nofollow
+      - traefik.http.middlewares.planportal-sec.headers.customResponseHeaders.Server=
+      # ── rate-limit middleware (60 r/s burst 120) ──
+      - traefik.http.middlewares.planportal-rl.ratelimit.average=60
+      - traefik.http.middlewares.planportal-rl.ratelimit.burst=120
+      - traefik.http.middlewares.planportal-rl.ratelimit.period=1s
 
 volumes:
   postgres-data:
@@ -168,4 +198,7 @@ volumes:
 networks:
   planportal:
     name: planportal
+    external: true
+  coolify:
+    name: coolify
     external: true
