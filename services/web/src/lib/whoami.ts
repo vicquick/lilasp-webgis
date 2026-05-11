@@ -1,10 +1,11 @@
 export interface WhoAmI {
-  user: string;
-  email?: string;
-  name?: string;
-  uid?: string;
+  user: string | null;
+  email?: string | null;
+  name?: string | null;
+  uid?: string | null;
   groups: string[];
   entitlements: string[];
+  authenticated: boolean;
 }
 
 declare const __WEB_WHOAMI__: string;

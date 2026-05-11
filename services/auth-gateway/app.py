@@ -19,9 +19,11 @@ def _split_groups(raw: str | None) -> list[str]:
 
 @app.get("/whoami")
 def whoami():
+    # Return 200 with user=null on the interim basic-auth path so the
+    # SPA can read the body silently. Returning 401 here surfaces as a
+    # browser-level console error on every page load, which is just noise
+    # until Authentik is wired.
     user = request.headers.get("X-Authentik-Username")
-    if not user:
-        return jsonify(error="not authenticated"), 401
     return jsonify(
         user=user,
         email=request.headers.get("X-Authentik-Email"),
@@ -29,6 +31,7 @@ def whoami():
         uid=request.headers.get("X-Authentik-Uid"),
         groups=_split_groups(request.headers.get("X-Authentik-Groups")),
         entitlements=_split_groups(request.headers.get("X-Authentik-Entitlements")),
+        authenticated=bool(user),
     )
 
 

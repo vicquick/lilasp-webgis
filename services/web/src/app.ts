@@ -41,6 +41,31 @@ function showInspectorPrint(): void {
 }
 
 
+function showProjectInfo(project: ServiceProject): void {
+  const renderable = project.layers.filter((l) => l.geom_type !== 'No geometry').length;
+  const lookups = project.layers.filter((l) => l.geom_type === 'No geometry').length;
+  const bboxText = project.bbox
+    ? project.bbox.map((n) => n.toFixed(0)).join(' · ')
+    : '— (unbestimmt)';
+  inspectorApi.open(
+    'Projekt-Info',
+    `<dl>
+      <div class="feature__row"><dt>Titel</dt><dd>${escapeHtml(project.title)}</dd></div>
+      <div class="feature__row"><dt>Slug</dt><dd>${escapeHtml(project.slug)}</dd></div>
+      <div class="feature__row"><dt>CRS</dt><dd>${escapeHtml(project.crs)}</dd></div>
+      <div class="feature__row"><dt>BBox</dt><dd>${escapeHtml(bboxText)}</dd></div>
+      <div class="feature__row"><dt>Render-Layer</dt><dd>${renderable}</dd></div>
+      <div class="feature__row"><dt>Lookup-Tabellen</dt><dd>${lookups}</dd></div>
+      <div class="feature__row"><dt>Karten-Themen</dt><dd>${project.themes.length}</dd></div>
+      <div class="feature__row"><dt>Drucklayouts</dt><dd>${project.print_layouts.length}</dd></div>
+    </dl>`,
+  );
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]!);
+}
+
 async function selectProject(slug: string): Promise<void> {
   const project = state.projects.find((p) => p.slug === slug);
   if (!project) return;
@@ -83,6 +108,10 @@ async function selectProject(slug: string): Promise<void> {
   mountCoordsReadout(builtMap.map, $('#readout-coords'), project.crs);
 
   mountProjectPicker($('#project-picker'), state.projects, slug, $('#projects-count'));
+
+  // Default inspector panel: project info card (right rail isn't empty
+  // until the user clicks identify/print).
+  showProjectInfo(project);
 
   history.replaceState(null, '', `?project=${encodeURIComponent(slug)}`);
 }
