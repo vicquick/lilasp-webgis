@@ -56,6 +56,16 @@ function buildBasemap(key: BasemapKey): TileLayer<XYZ | OSM> {
   return layer;
 }
 
+/**
+ * Build OL tile layers for every renderable QGIS layer in the project.
+ * Cold-start aware:
+ *   - Layers default to `visible: false` so the first paint is just the
+ *     basemap (instant) and the user opts-in per layer.
+ *   - QGIS layer visibility from the .qgs is preserved in a custom
+ *     property `wms-default-visible` so the map-theme switcher and
+ *     layer-tree can honour it without forcing 46 simultaneous WMS
+ *     requests at first paint.
+ */
 function projectLayers(project: ServiceProject): TileLayer<TileWMS>[] {
   return project.layers
     .filter((l) => l.type === 'vector' || l.type === 'raster')
@@ -75,12 +85,13 @@ function projectLayers(project: ServiceProject): TileLayer<TileWMS>[] {
       });
       const tile = new TileLayer({
         source,
-        visible: layer.wms_visible,
+        visible: false,
         opacity: 1,
         properties: {
           id: `${project.slug}__${layer.id}`,
           name: layer.name,
           'layer-id': layer.id,
+          'wms-default-visible': layer.wms_visible,
           'planportal-layer': true,
         },
       });

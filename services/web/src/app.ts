@@ -5,7 +5,7 @@ import { loadServices, type ServiceProject } from './lib/services-loader';
 import { createProjectMap, type BuiltMap } from './lib/masterportal-bridge';
 import { mountProjectPicker } from './plugins/project-picker';
 import { mountMapThemeSelect } from './plugins/map-theme';
-import { mountLayerTree, applyTheme } from './plugins/layer-tree';
+import { mountLayerTree, applyTheme, setAllLayers, type StatusReporter } from './plugins/layer-tree';
 import { mountIdentify } from './plugins/identify';
 import { renderPrintForm, wirePrintForm } from './plugins/getprint';
 import { mountMapControls, mountCoordsReadout } from './plugins/map-controls';
@@ -60,7 +60,16 @@ async function selectProject(slug: string): Promise<void> {
   const builtMap = createProjectMap('map', project);
   state.builtMap = builtMap;
 
-  mountLayerTree($('#layer-tree'), builtMap, project, $('#layers-count'));
+  const status: StatusReporter = {
+    set(kind, text) {
+      const pill = $('#status-pill');
+      pill.innerHTML = `<span class="dot dot--${kind}"></span><span class="status-text">${text}</span>`;
+    },
+  };
+  mountLayerTree($('#layer-tree'), builtMap, project, $('#layers-count'), status);
+
+  $('#layers-default').onclick = () => setAllLayers($('#layer-tree'), builtMap, project, 'qgis-default');
+  $('#layers-none').onclick = () => setAllLayers($('#layer-tree'), builtMap, project, 'none');
   mountMapThemeSelect($('#map-themes'), project, (themeName) =>
     applyTheme($('#layer-tree'), builtMap, project, themeName),
   );

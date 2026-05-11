@@ -23,6 +23,9 @@
           <span class="topbar__project-title" id="project-title">—</span>
         </div>
         <div class="topbar__spacer"></div>
+        <div class="topbar__status" id="status-pill" aria-live="polite">
+          <span class="dot dot--ok"></span><span class="status-text">bereit</span>
+        </div>
         <div class="topbar__user" id="userinfo" aria-live="polite">…</div>
       </header>
 
@@ -45,6 +48,10 @@
             <h2 class="panel__title">Layer</h2>
             <span class="panel__count" id="layers-count">0</span>
           </header>
+          <div class="panel__actions">
+            <button class="btn-ghost" id="layers-default">QGIS-Voreinstellung</button>
+            <button class="btn-ghost" id="layers-none">Alle aus</button>
+          </div>
           <div class="panel__body" id="layer-tree"></div>
         </section>
       </aside>
