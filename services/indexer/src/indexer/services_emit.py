@@ -30,7 +30,9 @@ def _layer_dict(qgs_path: str, layer) -> dict:
         "crs": layer.crs,
         "wms_visible": layer.wms_visible,
         "wms_url": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={qgs_path}",
-        "wms_layer_name": layer.id,
+        # QGIS Server's WMS uses the layer NAME (publishable, human-readable)
+        # in the LAYERS query parameter — NOT the internal XML id.
+        "wms_layer_name": layer.name,
         "wfs_url": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={qgs_path}",
         "pmtiles_url": None,
         "style_url": None,
