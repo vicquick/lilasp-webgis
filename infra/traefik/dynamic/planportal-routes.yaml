@@ -1,6 +1,9 @@
-# Planportal Traefik routes (Coolify production).
-# Routes /qgisserver, /tiles, /whoami, /services.json, /api/* — all gated
-# by authentik-auth except the login flow.
+# Planportal Traefik dynamic routes (Coolify production).
+# Single public host: webgis.lilasp.de → planportal-web. ALL internal
+# services (qgis-server, martin, auth-gateway, indexer, postgres, redis)
+# have ZERO Traefik labels and are unreachable from the internet — nginx
+# in the web container reverse-proxies them across the `planportal`
+# docker network.
 
 http:
   routers:
@@ -8,59 +11,48 @@ http:
       rule: 'Host(`webgis.lilasp.de`)'
       entryPoints: [https]
       service: planportal-web
-      middlewares: [authentik-auth@file]
-      tls:
-        certResolver: letsencrypt
-
-    planportal-qgis:
-      rule: 'Host(`webgis.lilasp.de`) && PathPrefix(`/qgisserver`)'
-      entryPoints: [https]
-      service: planportal-qgis
-      middlewares: [authentik-auth@file, planportal-qgis-strip]
-      priority: 9000
-      tls:
-        certResolver: letsencrypt
-
-    planportal-tiles:
-      rule: 'Host(`webgis.lilasp.de`) && PathPrefix(`/tiles`)'
-      entryPoints: [https]
-      service: planportal-martin
-      middlewares: [authentik-auth@file, planportal-tiles-strip]
-      priority: 9000
-      tls:
-        certResolver: letsencrypt
-
-    planportal-whoami:
-      rule: 'Host(`webgis.lilasp.de`) && Path(`/whoami`)'
-      entryPoints: [https]
-      service: planportal-auth-gateway
-      middlewares: [authentik-auth@file]
-      priority: 9500
+      middlewares:
+        - planportal-security-headers@file
+        - authentik-auth@file
       tls:
         certResolver: letsencrypt
 
   middlewares:
-    planportal-qgis-strip:
-      stripPrefix:
-        prefixes: ['/qgisserver']
-    planportal-tiles-strip:
-      stripPrefix:
-        prefixes: ['/tiles']
+    # Strict security headers applied to every public response.
+    planportal-security-headers:
+      headers:
+        # Reject HTTP on www subdomain forever once verified working.
+        stsSeconds: 63072000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: 'strict-origin-when-cross-origin'
+        frameDeny: true
+        # CSP — tighten as the SPA stabilises. WMS GetFeatureInfo returns
+        # arbitrary HTML; relax cautiously.
+        contentSecurityPolicy: >-
+          default-src 'self';
+          img-src 'self' data: blob: https:;
+          style-src 'self' 'unsafe-inline';
+          script-src 'self' 'unsafe-inline' 'unsafe-eval';
+          connect-src 'self' https://webgis.lilasp.de;
+          font-src 'self' data:;
+          frame-ancestors 'none';
+        permissionsPolicy: >-
+          camera=(),
+          microphone=(),
+          geolocation=(self),
+          interest-cohort=()
+        customResponseHeaders:
+          X-Permitted-Cross-Domain-Policies: 'none'
+          X-Robots-Tag: 'noindex, nofollow'
+          Server: ''
 
   services:
     planportal-web:
       loadBalancer:
+        passHostHeader: true
         servers:
           - url: 'http://planportal-web:80'
-    planportal-qgis:
-      loadBalancer:
-        servers:
-          - url: 'http://planportal-qgisserver:8080'
-    planportal-martin:
-      loadBalancer:
-        servers:
-          - url: 'http://planportal-martin:3000'
-    planportal-auth-gateway:
-      loadBalancer:
-        servers:
-          - url: 'http://planportal-auth-gateway:5000'

@@ -1,4 +1,4 @@
-# ADR 0004 — Vector-tile eligibility rule
+# ADR 0004 — Vector-tile eligibility rule (and ADR-0005 below)
 
 - Status: accepted
 - Date: 2026-05-11
