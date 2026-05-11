@@ -173,6 +173,7 @@ function wireMobileShell(): void {
 
 function wireThemeToggle(): void {
   $('#topbar-theme').addEventListener('click', () => toggleScheme());
+  $('#theme-chip').addEventListener('click', () => openMobilePanel('themes'));
 }
 
 // ─── project lifecycle ─────────────────────────────────────────────
@@ -211,18 +212,33 @@ async function selectProject(slug: string): Promise<void> {
   $('#layers-none').onclick = () => setAllLayers(layerTreeEl, builtMap, project, 'none');
 
   const defaultTheme = pickDefaultTheme(project.themes);
-  mountMapThemeSelect($('#map-themes'), project, (themeName) =>
-    applyTheme(layerTreeEl, builtMap, project, themeName),
-    defaultTheme?.name ?? null,
-  );
 
   // Apply default theme on load so the canvas isn't blank.
+  const setActiveTheme = (themeName: string | null) => {
+    $('#theme-hint').textContent = themeName ?? '';
+    const chipLabel = $('#theme-chip-label');
+    const chip = $('#theme-chip');
+    if (themeName) {
+      chipLabel.textContent = themeName.replace(/[_\s]+/g, ' · ').trim();
+      chip.removeAttribute('hidden');
+    } else {
+      chipLabel.textContent = '—';
+    }
+    document.querySelectorAll<HTMLButtonElement>('.theme-chips__btn').forEach((btn) => {
+      btn.setAttribute('data-active', btn.dataset.theme === themeName ? 'true' : 'false');
+    });
+  };
   if (defaultTheme) {
     applyTheme(layerTreeEl, builtMap, project, defaultTheme.name);
-    $('#theme-hint').textContent = defaultTheme.name;
+    setActiveTheme(defaultTheme.name);
   } else {
-    $('#theme-hint').textContent = '';
+    setActiveTheme(null);
   }
+  // Re-wire map-theme select to also update chip state when changed.
+  mountMapThemeSelect($('#map-themes'), project, (themeName) => {
+    applyTheme(layerTreeEl, builtMap, project, themeName);
+    setActiveTheme(themeName);
+  }, defaultTheme?.name ?? null);
 
   mountIdentify(builtMap.map, project, inspectorApi);
   mountMapControls({
