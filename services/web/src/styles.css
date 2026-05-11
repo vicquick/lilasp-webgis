@@ -804,13 +804,14 @@ html[data-theme='light'] .topbar__theme .icon-moon { display: none; }
 
 /* ════════════════════════════════════════════════════════════════════
    Mobile quick-bar — persistent bottom tab strip
+   Visible on:  viewport ≤ 900px  OR  any coarse-pointer device.
    ──────────────────────────────────────────────────────────────── */
 
 .quick-bar {
+  display: none;
   position: fixed; z-index: 27;
   left: 0; right: 0; bottom: 0;
   padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
-  display: grid;
   grid-auto-flow: column; grid-auto-columns: 1fr;
   gap: 6px;
   background: color-mix(in oklab, var(--surface) 88%, transparent);
@@ -856,15 +857,88 @@ html[data-theme='light'] .topbar__theme .icon-moon { display: none; }
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   Responsive — mobile (≤ 760px)
+   Theme chip — pinned on the map, always shows the active map theme.
+   Tap → opens the themes sheet on mobile. Hidden on desktop.
+   ──────────────────────────────────────────────────────────────── */
+
+.theme-chip {
+  display: none;
+  position: fixed; z-index: 22;
+  top: calc(var(--topbar-h) + 10px); left: 50%;
+  transform: translateX(-50%);
+  align-items: center; gap: 7px;
+  padding: 7px 11px 7px 9px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font: 500 12px/1 var(--font-sans);
+  letter-spacing: 0.005em;
+  max-width: calc(100vw - 32px);
+}
+.theme-chip svg:first-child { color: var(--teal); flex-shrink: 0; }
+.theme-chip svg:last-child  { color: var(--text-mute); flex-shrink: 0; }
+.theme-chip__label {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  max-width: 60vw;
+}
+.theme-chip:hover { border-color: var(--teal-line); }
+.theme-chip:active { transform: translateX(-50%) scale(0.96); }
+
+/* ════════════════════════════════════════════════════════════════════
+   Mobile theme picker — chip stack instead of <select>
+   ──────────────────────────────────────────────────────────────── */
+
+.theme-chips {
+  display: none;  /* shown only on mobile via the @media block below */
+  flex-direction: column; gap: 4px;
+}
+.theme-chips__btn {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 13px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  background: var(--surface-mute);
+  color: var(--text);
+  font: 500 13.5px/1.2 var(--font-sans);
+  text-align: left;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.theme-chips__btn:hover { border-color: var(--teal-line); }
+.theme-chips__btn[data-active='true'] {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+  color: var(--teal);
+}
+.theme-chips__count {
+  font: 500 11px/1 var(--font-mono);
+  color: var(--text-mute);
+  padding: 3px 7px;
+  background: var(--bg-soft);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.theme-chips__btn[data-active='true'] .theme-chips__count {
+  background: var(--surface);
+  color: var(--teal);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Responsive — mobile (≤ 900px  or  any coarse pointer)
 
    The persistent quick-bar at the bottom exposes the four "things you
    actually do on a phone" directly: pick a project, switch theme,
    toggle layers, see info. Each opens a focused single-panel
    bottom-sheet so the user is never one wrong tap from getting lost.
+
+   We use a *union* media query so landscape phones and small tablets
+   (typically 768–932 CSS px wide) also get the touch-first layout.
    ──────────────────────────────────────────────────────────────── */
 
-@media (max-width: 760px) {
+@media (max-width: 900px), (pointer: coarse) and (max-width: 1280px) {
   :root { --topbar-h: 52px; }
 
   .app {
@@ -877,6 +951,10 @@ html[data-theme='light'] .topbar__theme .icon-moon { display: none; }
   .topbar__user::before { width: 32px; height: 32px; }
 
   .quick-bar { display: grid; }
+  .theme-chip { display: inline-flex; }
+  /* Swap the select for the touch-friendly chip stack on mobile. */
+  #map-themes .theme-select { display: none; }
+  #map-themes .theme-chips  { display: flex; }
 
   /* Sidebar → bottom sheet, shared between projects/themes/layers */
   .sidebar {
@@ -957,15 +1035,19 @@ html[data-theme='light'] .topbar__theme .icon-moon { display: none; }
   .panel__head { padding: 16px var(--space-4) 8px; }
 
   /* Reposition zoom controls so they don't collide with the quick-bar. */
-  .map-overlay--tl { top: 12px; left: 12px; }
-  .map-overlay--tr { top: 12px; right: 12px; }
-  .map-overlay--bl { bottom: 84px; left: 12px; }
-  .map-overlay--br { bottom: 84px; right: 12px; }
+  .map-overlay--tl { top: 64px;  left: 12px; }   /* clear of theme-chip */
+  .map-overlay--tr { top: 12px;  right: 12px; }
+  .map-overlay--bl { bottom: 96px; left: 12px; }
+  .map-overlay--br { bottom: 96px; right: 12px; }
+  .ol-scale-line   { bottom: 102px !important; left: 12px !important; }
+  .ol-attribution  { bottom: 88px !important; right: 0 !important; }
 }
 
-@media (min-width: 761px) {
-  .quick-bar { display: none !important; }
-  .backdrop { display: none !important; }
+/* Desktop — explicit hide so author CSS wins even if the JS hasn't run yet. */
+@media (min-width: 901px) and (pointer: fine) {
+  .quick-bar  { display: none !important; }
+  .theme-chip { display: none !important; }
+  .backdrop   { display: none !important; }
 }
 
 /* Reduced motion */
