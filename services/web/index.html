@@ -24,9 +24,6 @@
   <body>
     <div id="root" class="app" data-mobile-panel="closed">
       <header class="topbar">
-        <button class="icon-btn topbar__menu" id="topbar-menu" aria-label="Menü" hidden>
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-        </button>
         <div class="brand">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
             <path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z"/>
@@ -96,9 +93,24 @@
         <div class="map-overlay map-overlay--toast" id="map-toast" hidden></div>
       </main>
 
-      <button class="fab" id="fab-inspector" aria-label="Inspektor öffnen" hidden>
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7v.01"/></svg>
-      </button>
+      <nav class="quick-bar" id="quick-bar" aria-label="Schnellzugriff" hidden>
+        <button type="button" class="quick-bar__btn" data-target="projects">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h16"/></svg>
+          <span>Projekte</span>
+        </button>
+        <button type="button" class="quick-bar__btn" data-target="themes">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="7.5" cy="10" r="1.4" fill="currentColor" stroke="none"/><circle cx="11" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.4" fill="currentColor" stroke="none"/></svg>
+          <span>Thema</span>
+        </button>
+        <button type="button" class="quick-bar__btn" data-target="layers">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l10 6-10 6L2 8z"/><path d="M2 14l10 6 10-6"/></svg>
+          <span>Layer</span>
+        </button>
+        <button type="button" class="quick-bar__btn" data-target="info">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7v.01"/></svg>
+          <span>Info</span>
+        </button>
+      </nav>
 
       <aside class="inspector" id="inspector" data-open="false" aria-label="Informationen">
         <div class="sidebar__grabber" aria-hidden="true"></div>

@@ -803,21 +803,40 @@ html[data-theme='light'] .topbar__theme .icon-moon { display: none; }
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   Floating action button (mobile)
+   Mobile quick-bar — persistent bottom tab strip
    ──────────────────────────────────────────────────────────────── */
 
-.fab {
-  position: fixed; z-index: 25;
-  bottom: 24px; right: 20px;
-  width: 56px; height: 56px;
-  border-radius: 50%;
-  display: grid; place-items: center;
-  background: var(--teal); color: white;
-  box-shadow: 0 12px 30px color-mix(in oklab, var(--teal) 40%, transparent), var(--shadow-lg);
-  transition: transform 200ms var(--ease-spring), box-shadow 200ms ease;
+.quick-bar {
+  position: fixed; z-index: 27;
+  left: 0; right: 0; bottom: 0;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  display: grid;
+  grid-auto-flow: column; grid-auto-columns: 1fr;
+  gap: 6px;
+  background: color-mix(in oklab, var(--surface) 88%, transparent);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.18);
 }
-.fab:hover { transform: translateY(-2px) scale(1.05); }
-.fab:active { transform: scale(0.94); }
+.quick-bar__btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px;
+  padding: 9px 4px;
+  min-height: 56px;
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  font: 500 10.5px/1 var(--font-sans);
+  letter-spacing: 0.02em;
+  transition: background 140ms ease, color 140ms ease, transform 140ms var(--ease-spring);
+}
+.quick-bar__btn svg { transition: transform 200ms var(--ease-spring); }
+.quick-bar__btn:hover { color: var(--text); }
+.quick-bar__btn:active { transform: scale(0.94); }
+.quick-bar__btn[data-active='true'] {
+  background: var(--teal-soft);
+  color: var(--teal);
+}
+.quick-bar__btn[data-active='true'] svg { transform: translateY(-1px); }
 
 .backdrop {
   position: fixed; inset: 0; z-index: 22;
@@ -838,8 +857,11 @@ html[data-theme='light'] .topbar__theme .icon-moon { display: none; }
 
 /* ════════════════════════════════════════════════════════════════════
    Responsive — mobile (≤ 760px)
-   Sidebar + inspector become bottom-sheets with a drag grabber.
-   Topbar shrinks. Touch targets ≥ 44px.
+
+   The persistent quick-bar at the bottom exposes the four "things you
+   actually do on a phone" directly: pick a project, switch theme,
+   toggle layers, see info. Each opens a focused single-panel
+   bottom-sheet so the user is never one wrong tap from getting lost.
    ──────────────────────────────────────────────────────────────── */
 
 @media (max-width: 760px) {
@@ -850,69 +872,99 @@ html[data-theme='light'] .topbar__theme .icon-moon { display: none; }
   }
 
   .topbar { padding: 0 14px; gap: 10px; }
-  .topbar__menu { display: grid; }
   .topbar__divider, .topbar__project, .brand__tagline { display: none; }
   .topbar__user { font-size: 0; }
   .topbar__user::before { width: 32px; height: 32px; }
 
-  /* Sidebar → bottom sheet */
+  .quick-bar { display: grid; }
+
+  /* Sidebar → bottom sheet, shared between projects/themes/layers */
   .sidebar {
     position: fixed; left: 0; right: 0; bottom: 0; top: auto;
     width: auto; height: 78dvh; max-height: 78dvh;
     border-right: 0; border-top: 1px solid var(--border);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     transform: translateY(105%);
-    transition: transform 320ms var(--ease-out);
-    z-index: 24; box-shadow: var(--shadow-lg);
+    transition: transform 340ms var(--ease-out);
+    z-index: 25; box-shadow: var(--shadow-lg);
+    padding-bottom: 88px; /* leave room for the quick-bar */
   }
-  .app[data-mobile-panel='sidebar'] .sidebar { transform: translateY(0); }
+  .app[data-mobile-panel='projects'] .sidebar,
+  .app[data-mobile-panel='themes']   .sidebar,
+  .app[data-mobile-panel='layers']   .sidebar,
+  .app[data-mobile-panel='sidebar']  .sidebar {
+    transform: translateY(0);
+  }
   .sidebar__grabber {
     display: block; position: absolute;
     top: 8px; left: 50%; transform: translateX(-50%);
-    width: 40px; height: 4px; border-radius: 999px;
+    width: 44px; height: 4px; border-radius: 999px;
     background: var(--border);
   }
   .sidebar > .panel:first-of-type { padding-top: 14px; }
 
+  /* Focus the right panel inside the sheet — hide the others. */
+  .app[data-mobile-panel='projects'] #panel-themes,
+  .app[data-mobile-panel='projects'] #panel-layers,
+  .app[data-mobile-panel='themes']   #panel-projects,
+  .app[data-mobile-panel='themes']   #panel-layers,
+  .app[data-mobile-panel='layers']   #panel-projects,
+  .app[data-mobile-panel='layers']   #panel-themes {
+    display: none;
+  }
+  /* When focused, the visible panel takes all the sheet height. */
+  .app[data-mobile-panel='themes']   #panel-themes,
+  .app[data-mobile-panel='layers']   #panel-layers,
+  .app[data-mobile-panel='projects'] #panel-projects {
+    flex: 1; min-height: 0;
+  }
+  .app[data-mobile-panel='themes']   #panel-themes .panel__body,
+  .app[data-mobile-panel='projects'] #panel-projects .panel__body {
+    overflow-y: auto;
+  }
+
+  /* Bigger theme select for finger-tapping */
+  .app[data-mobile-panel='themes'] .theme-select {
+    padding: 14px 40px 14px 16px; font-size: 14.5px;
+  }
+
   /* Inspector → bottom sheet */
   .inspector {
     position: fixed; left: 0; right: 0; bottom: 0; top: auto;
-    width: auto; height: 70dvh; max-height: 70dvh;
+    width: auto; height: 72dvh; max-height: 72dvh;
     border-left: 0; border-top: 1px solid var(--border);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     transform: translateY(105%); opacity: 1;
-    transition: transform 320ms var(--ease-out);
-    z-index: 24; box-shadow: var(--shadow-lg);
+    transition: transform 340ms var(--ease-out);
+    z-index: 25; box-shadow: var(--shadow-lg);
+    padding-bottom: 80px;
   }
-  .app[data-mobile-panel='inspector'] .inspector,
-  .app[data-mobile-panel='inspector'][data-inspector='true'] .inspector {
+  .app[data-mobile-panel='info']      .inspector,
+  .app[data-mobile-panel='inspector'] .inspector {
     transform: translateY(0);
   }
   .app[data-inspector='false'] .inspector { opacity: 0; pointer-events: none; }
-  .app[data-inspector='true'] .inspector { opacity: 1; pointer-events: auto; }
+  .app[data-inspector='true'] .inspector  { opacity: 1; pointer-events: auto; }
 
   /* Bigger hit targets on mobile */
   .map-tools__btn { width: 44px; height: 44px; }
-  .layer-row { padding: 9px 8px; }
-  .layer-row__cb { width: 18px; height: 18px; }
-  .layer-row__swatch { width: 18px; height: 18px; }
-  .layer-group__head { padding: 9px 8px; }
-  .layer-group__cb { width: 18px; height: 18px; }
-  .project-card { padding: 13px 14px; }
+  .layer-row { padding: 10px 8px; }
+  .layer-row__cb { width: 19px; height: 19px; }
+  .layer-row__swatch { width: 19px; height: 19px; }
+  .layer-group__head { padding: 10px 8px; }
+  .layer-group__cb { width: 19px; height: 19px; }
+  .project-card { padding: 14px 15px; }
   .panel__head { padding: 16px var(--space-4) 8px; }
 
-  /* Reposition zoom controls so they don't collide with FAB */
+  /* Reposition zoom controls so they don't collide with the quick-bar. */
   .map-overlay--tl { top: 12px; left: 12px; }
   .map-overlay--tr { top: 12px; right: 12px; }
   .map-overlay--bl { bottom: 84px; left: 12px; }
   .map-overlay--br { bottom: 84px; right: 12px; }
-
-  /* FAB only on mobile */
-  .fab { display: grid; }
 }
 
 @media (min-width: 761px) {
-  .fab { display: none !important; }
+  .quick-bar { display: none !important; }
   .backdrop { display: none !important; }
 }
 
