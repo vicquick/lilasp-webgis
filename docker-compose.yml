@@ -1,132 +1,171 @@
-# Planportal — local dev stack.
-# Production runs each service as a standalone Coolify Dockerfile app.
-# See infra/coolify/README.md for the prod story.
+# Planportal — production stack for Coolify dockercompose build pack.
+#
+# Coolify auto-adds:
+#   - a per-app docker network `{uuid}` joined by every service
+#   - service-name DNS (so `qgisserver`, `martin`, `auth-gateway` resolve)
+#   - Traefik labels on services whose fqdn is set in Coolify
+#
+# We override Coolify's default behaviour where it matters:
+#   - PUBLIC = only `web`. All other services have NO Traefik labels.
+#   - Internal traffic routes via nginx in `web` over the planportal network.
+#   - /srv/gis-staging on the HOST is bind-mounted into qgis-server + indexer
+#     as /srv/gis (read-write for indexer, read-only for qgis-server).
+#
+# Local dev (no Coolify): cp .env.example .env && docker compose up -d.
 
 services:
 
-  # ── Postgres metadata DB (PostGIS) ────────────────────────────────────
   postgres:
     image: postgis/postgis:18-3.4
-    container_name: planportal-postgres
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB:-planportal}
+      POSTGRES_USER: ${POSTGRES_USER:-planportal}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER:-planportal}']
       interval: 10s
+      timeout: 5s
       retries: 8
+      start_period: 30s
     networks: [planportal]
+    restart: unless-stopped
 
-  # ── Redis (caps + tile cache) ─────────────────────────────────────────
   redis:
     image: redis:7-alpine
-    container_name: planportal-redis
+    command: ['redis-server', '--requirepass', '${REDIS_PASSWORD}', '--maxmemory', '256mb', '--maxmemory-policy', 'allkeys-lru', '--save', '']
+    healthcheck:
+      test: ['CMD', 'redis-cli', '--no-auth-warning', '-a', '${REDIS_PASSWORD}', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 8
     networks: [planportal]
+    restart: unless-stopped
 
-  # ── QGIS Server (py-qgis-server) ──────────────────────────────────────
   qgisserver:
     build:
       context: ./services/qgis-server
-    container_name: planportal-qgisserver
     environment:
-      QGSRV_SERVER_WORKERS: ${QGSRV_SERVER_WORKERS}
-      QGSRV_SERVER_TIMEOUT: ${QGSRV_SERVER_TIMEOUT}
+      QGSRV_SERVER_WORKERS: ${QGSRV_SERVER_WORKERS:-4}
+      QGSRV_SERVER_TIMEOUT: ${QGSRV_SERVER_TIMEOUT:-60}
       QGSRV_SERVER_HTTP_PROXY: 'yes'
-      QGSRV_SERVER_PROXY_URL: ${QGSRV_SERVER_PROXY_URL}
+      QGSRV_SERVER_PROXY_URL: ${QGSRV_SERVER_PROXY_URL:-https://webgis.lilasp.de/qgisserver}
       QGSRV_SERVER_MEMORY_HIGH_WATER_MARK: '0.85'
-      QGSRV_CACHE_SIZE: ${QGSRV_CACHE_SIZE}
+      QGSRV_CACHE_SIZE: ${QGSRV_CACHE_SIZE:-30}
       QGSRV_CACHE_ROOTDIR: /srv/gis
       QGSRV_CACHE_CHECK_INTERVAL: '300'
       QGSRV_CACHE_STRICT_CHECK: 'no'
       QGSRV_TRUST_LAYER_METADATA: 'yes'
-      QGSRV_LOGGING_LEVEL: ${QGSRV_LOGGING_LEVEL}
+      QGSRV_LOGGING_LEVEL: ${QGSRV_LOGGING_LEVEL:-INFO}
       QGIS_SERVER_PARALLEL_RENDERING: '0'
     volumes:
-      - gis-data:/srv/gis:ro
+      # Host bind-mount: project files (.qgz with embedded creds) live OFF git.
+      - /srv/gis-staging:/srv/gis:ro
       - qgis-home:/home/qgis
-    networks: [planportal]
-
-  # ── Martin (vector tiles) ─────────────────────────────────────────────
-  martin:
-    image: ghcr.io/maplibre/martin:v0.18.0
-    container_name: planportal-martin
-    command: ['--config', '/config/config.yaml']
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-    volumes:
-      - ./services/martin/config.yaml:/config/config.yaml:ro
-      - tiles-data:/srv/tiles:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O- "http://127.0.0.1:8080/?SERVICE=WMS&REQUEST=GetCapabilities" >/dev/null || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
     depends_on:
       postgres:
         condition: service_healthy
     networks: [planportal]
+    restart: unless-stopped
 
-  # ── Indexer (watchfiles + parser + emitter) ───────────────────────────
+  martin:
+    image: ghcr.io/maplibre/martin:v0.18.0
+    command: ['--config', '/config/config.yaml']
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-planportal}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-planportal}
+    volumes:
+      - ./services/martin/config.yaml:/config/config.yaml:ro
+      - /srv/gis-staging-tiles:/srv/tiles:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O- http://127.0.0.1:3000/health >/dev/null || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [planportal]
+    restart: unless-stopped
+
   indexer:
     build:
       context: ./services/indexer
-    container_name: planportal-indexer
     environment:
-      DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: ${REDIS_URL}
-      QGS_ROOT: ${QGS_ROOT}
-      TILES_ROOT: ${TILES_ROOT}
-      WEB_SERVICES_JSON: ${WEB_SERVICES_JSON}
-      PYQGIS_URL: ${PYQGIS_URL}
-      INDEXER_DEBOUNCE_SECONDS: ${INDEXER_DEBOUNCE_SECONDS}
-      QFC_BASE_URL: ${QFC_BASE_URL}
-      QFC_ADMIN_TOKEN: ${QFC_ADMIN_TOKEN}
-      QFC_SYNC_INTERVAL_MINUTES: ${QFC_SYNC_INTERVAL_MINUTES}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-planportal}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-planportal}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      QGS_ROOT: /srv/gis
+      TILES_ROOT: /srv/tiles
+      WEB_SERVICES_JSON: /srv/web/services.json
+      PYQGIS_URL: http://qgisserver:8080
+      PUBLIC_QGIS_BASE: /qgisserver
+      PUBLIC_TILES_BASE: /tiles
+      INDEXER_DEBOUNCE_SECONDS: ${INDEXER_DEBOUNCE_SECONDS:-2}
+      QFC_BASE_URL: ${QFC_BASE_URL:-}
+      QFC_ADMIN_TOKEN: ${QFC_ADMIN_TOKEN:-}
+      QFC_SYNC_INTERVAL_MINUTES: ${QFC_SYNC_INTERVAL_MINUTES:-15}
+      LOG_LEVEL: ${INDEXER_LOG_LEVEL:-INFO}
     volumes:
-      - gis-data:/srv/gis
-      - tiles-data:/srv/tiles
+      - /srv/gis-staging:/srv/gis
+      - /srv/gis-staging-tiles:/srv/tiles
       - web-static:/srv/web
-      - ./projects:/srv/seed:ro
     depends_on:
       postgres:
         condition: service_healthy
     networks: [planportal]
+    restart: unless-stopped
 
-  # ── Auth gateway (whoami sidecar) ─────────────────────────────────────
   auth-gateway:
     build:
       context: ./services/auth-gateway
-    container_name: planportal-auth-gateway
-    environment:
-      AUTH_GATEWAY_BIND: ${AUTH_GATEWAY_BIND}
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O- http://127.0.0.1:5000/health >/dev/null || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 5
     networks: [planportal]
+    restart: unless-stopped
 
-  # ── Web (OpenLayers SPA, served by nginx) ─────────────────────────────
   web:
     build:
       context: ./services/web
       args:
-        WEB_QGIS_BASE: ${WEB_QGIS_BASE}
-        WEB_TILES_BASE: ${WEB_TILES_BASE}
-        WEB_WHOAMI: ${WEB_WHOAMI}
-        WEB_SERVICES_JSON_URL: ${WEB_SERVICES_JSON_URL}
-    container_name: planportal-web
+        WEB_QGIS_BASE: /qgisserver
+        WEB_TILES_BASE: /tiles
+        WEB_WHOAMI: /whoami
+        WEB_SERVICES_JSON_URL: /services.json
     volumes:
       - web-static:/usr/share/nginx/html/data:ro
-    ports:
-      - '8080:80'
+    expose:
+      - '80'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O- http://127.0.0.1/healthz >/dev/null || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 5
     depends_on:
-      - qgisserver
-      - martin
-      - auth-gateway
+      qgisserver:
+        condition: service_started
+      martin:
+        condition: service_started
+      auth-gateway:
+        condition: service_started
     networks: [planportal]
+    restart: unless-stopped
 
 volumes:
   postgres-data:
   qgis-home:
-  gis-data:
-  tiles-data:
   web-static:
 
 networks:
   planportal:
     name: planportal
+    external: true
