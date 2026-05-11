@@ -181,6 +181,7 @@ services:
       - traefik.http.routers.planportal-web.tls.certresolver=letsencrypt
       - traefik.http.routers.planportal-web.middlewares=planportal-sec@docker,planportal-rl@docker,planportal-auth@docker
       - traefik.http.services.planportal-web.loadbalancer.server.port=80
+      - traefik.http.services.planportal-web.loadbalancer.serversTransport=planportal-longtimeout@file
       # ── security headers middleware (HSTS preload, CSP, frame-deny) ──
       - traefik.http.middlewares.planportal-sec.headers.stsSeconds=63072000
       - traefik.http.middlewares.planportal-sec.headers.stsIncludeSubdomains=true

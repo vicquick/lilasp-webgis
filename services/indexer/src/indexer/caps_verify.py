@@ -19,7 +19,7 @@ async def verify(slug: str) -> tuple[bool, str]:
         f"{config.PYQGIS_URL}/ows/?MAP={map_relative}"
         f"&SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0"
     )
-    async with httpx.AsyncClient(timeout=120) as client:
+    async with httpx.AsyncClient(timeout=300) as client:
         r = await client.get(url)
         if r.status_code != 200:
             return False, f"HTTP {r.status_code}: {r.text[:200]}"
