@@ -10,8 +10,11 @@ from . import config
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=5))
 async def verify(slug: str) -> tuple[bool, str]:
     """Returns (ok, error_message)."""
+    # MAP is resolved relative to QGSRV_CACHE_ROOTDIR (/srv/gis); the indexer
+    # discovers either a .qgs or a .qgz under <slug>/<slug>.* — try both.
+    map_relative = f"{slug}/{slug}.qgz"
     url = (
-        f"{config.PYQGIS_URL}/?MAP=file:/srv/gis/{slug}/{slug}.qgs"
+        f"{config.PYQGIS_URL}/?MAP={map_relative}"
         f"&SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0"
     )
     async with httpx.AsyncClient(timeout=30) as client:

@@ -56,14 +56,17 @@ async def _seed_from_dir() -> None:
 
 
 def _find_project_qgs(slug_dir: Path) -> Path | None:
-    """Return the canonical .qgs/.qgz for a slug dir."""
-    direct = slug_dir / f"{slug_dir.name}.qgs"
-    if direct.exists():
-        return direct
-    direct_z = slug_dir / f"{slug_dir.name}.qgz"
-    if direct_z.exists():
-        return direct_z
-    # Fall back to first .qgs in tree.
+    """Return the canonical .qgs/.qgz for a slug dir.
+
+    Preference order:
+      1. <slug>/<slug>.qgz   (production: zipped, single file)
+      2. <slug>/<slug>.qgs   (unzipped variant)
+      3. first .qgs in the tree
+      4. first .qgz in the tree
+    """
+    for candidate in (slug_dir / f"{slug_dir.name}.qgz", slug_dir / f"{slug_dir.name}.qgs"):
+        if candidate.exists():
+            return candidate
     return next(slug_dir.rglob("*.qgs"), None) or next(slug_dir.rglob("*.qgz"), None)
 
 
