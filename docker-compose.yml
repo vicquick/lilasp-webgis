@@ -50,16 +50,26 @@ services:
     build:
       context: ./services/qgis-server
     environment:
-      QGSRV_SERVER_WORKERS: ${QGSRV_SERVER_WORKERS:-4}
-      QGSRV_SERVER_TIMEOUT: ${QGSRV_SERVER_TIMEOUT:-60}
+      # Two workers is a safe ceiling for memory + project-compile contention.
+      # More workers means more concurrent fresh-project compiles which
+      # makes cold-start dramatically slower (verified: 4 workers each
+      # tried to compile cuxhaven.qgz independently and never finished).
+      QGSRV_SERVER_WORKERS: ${QGSRV_SERVER_WORKERS:-2}
+      QGSRV_SERVER_TIMEOUT: ${QGSRV_SERVER_TIMEOUT:-600}
       QGSRV_SERVER_HTTP_PROXY: 'yes'
       QGSRV_SERVER_PROXY_URL: ${QGSRV_SERVER_PROXY_URL:-https://webgis.lilasp.de/qgisserver}
-      QGSRV_SERVER_MEMORY_HIGH_WATER_MARK: '0.85'
+      # 0.95 instead of 0.85 — don't recycle workers mid-project-compile.
+      QGSRV_SERVER_MEMORY_HIGH_WATER_MARK: '0.95'
       QGSRV_CACHE_SIZE: ${QGSRV_CACHE_SIZE:-30}
       QGSRV_CACHE_ROOTDIR: /srv/gis
       QGSRV_CACHE_CHECK_INTERVAL: '300'
       QGSRV_CACHE_STRICT_CHECK: 'no'
       QGSRV_TRUST_LAYER_METADATA: 'yes'
+      # 36 print layouts in cuxhaven.qgz add measurable load time. We
+      # don't expose GetPrint via this UI yet (GetPrint still works on
+      # demand when the user clicks "Drucken"; it just won't pre-validate
+      # all layouts at project-open time).
+      QGSRV_DISABLE_GETPRINT: 'yes'
       QGSRV_LOGGING_LEVEL: ${QGSRV_LOGGING_LEVEL:-INFO}
       QGIS_SERVER_PARALLEL_RENDERING: '0'
     volumes:
