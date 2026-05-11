@@ -4,21 +4,19 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1
 
-# tippecanoe for PMTiles, ogr2ogr for reprojection.
+# tippecanoe (PMTiles), gdal-bin (ogr2ogr), nodejs+npm (geostyler-cli@7).
+# Use Debian Bookworm's bundled nodejs (18.19) — avoids the nodesource
+# curl/apt-key dance that flakes on the Coolify builder.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       tippecanoe \
       gdal-bin \
+      nodejs \
+      npm \
       ca-certificates \
-      curl \
- && rm -rf /var/lib/apt/lists/*
-
-# geostyler-cli (QML → MapLibre style)
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
- && apt-get update \
- && apt-get install -y --no-install-recommends nodejs \
  && npm install -g geostyler-cli@7 \
- && rm -rf /var/lib/apt/lists/*
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* /root/.npm
 
 WORKDIR /app
 
