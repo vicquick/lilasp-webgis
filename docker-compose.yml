@@ -22,7 +22,9 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-planportal}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      # PG 18+ wants the major-version-specific layout: mount the parent so
+      # the daemon manages /var/lib/postgresql/18/. See docker-library/postgres#1259.
+      - postgres-data:/var/lib/postgresql
       - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER:-planportal}']
