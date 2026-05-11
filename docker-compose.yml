@@ -199,10 +199,12 @@ services:
       - traefik.http.middlewares.planportal-rl.ratelimit.burst=120
       - traefik.http.middlewares.planportal-rl.ratelimit.period=1s
       # ── basic-auth interim (until Authentik forward-auth replaces it) ──
-      # bcrypt hash; `$` doubled to `$$` so Coolify env templating doesn't
-      # eat it. Swap this middleware for `authentik-auth@file` once
-      # Authentik is up.
-      - traefik.http.middlewares.planportal-auth.basicauth.users=${PLANPORTAL_BASIC_AUTH_USERS}
+      # Coolify auto-escapes `$` → `$$` in labels before docker-compose
+      # render, which then unescapes back to `$`. So we write the literal
+      # bcrypt hash with single `$` here. Password is the user-visible
+      # one shared with the operator at deploy time; rotate before going
+      # production-public.
+      - "traefik.http.middlewares.planportal-auth.basicauth.users=admin:$2y$05$jEbGLb8nzd9rlDkkn7E8vuYK4R/dSSEGBRKcZukTnmediC3wQu1xK"
       - traefik.http.middlewares.planportal-auth.basicauth.realm=Planportal
 
 volumes:
