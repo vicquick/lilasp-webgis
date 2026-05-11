@@ -64,6 +64,8 @@ def emit(projects: list[ProjectMeta], target: Path | None = None) -> Path:
     try:
         with os.fdopen(fd, "w") as f:
             json.dump(payload, f, indent=2, ensure_ascii=False)
+        # mkstemp creates 0600 — nginx runs as a different user and needs read.
+        os.chmod(tmp, 0o644)
         Path(tmp).replace(target)
     except Exception:
         Path(tmp).unlink(missing_ok=True)
