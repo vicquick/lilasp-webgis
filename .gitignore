@@ -23,11 +23,12 @@ services/web/public/services.json
 *.pmtiles
 *.mbtiles
 
-# Large project assets (committed selectively, see projects/README.md)
-projects/**/*.gpkg
-projects/**/*.tif
-projects/**/*.tiff
-projects/**/cache/
+# Project data — NEVER commit (.qgs/.qgz often embed DB passwords in datasource strings).
+# Project files live on the planportal-gis-data Coolify volume, populated out-of-band.
+projects/**/*
+!projects/**/*.md
+!projects/.gitkeep
+!projects/README.md
 
 # Coolify local state
 .coolify/
