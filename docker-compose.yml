@@ -176,6 +176,7 @@ services:
       - traefik.docker.network=coolify
       - traefik.http.routers.planportal-web.rule=Host(`webgis.lilasp.de`)
       - traefik.http.routers.planportal-web.entrypoints=https
+      - traefik.http.routers.planportal-web.priority=9500
       - traefik.http.routers.planportal-web.tls=true
       - traefik.http.routers.planportal-web.tls.certresolver=letsencrypt
       - traefik.http.routers.planportal-web.middlewares=planportal-sec@docker,planportal-rl@docker,planportal-auth@docker
