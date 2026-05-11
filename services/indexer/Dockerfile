@@ -18,9 +18,8 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY pyproject.toml .
-RUN pip install -e .
-
+COPY pyproject.toml ./
 COPY src/ ./src/
+RUN pip install -e .
 
 CMD ["python", "-m", "indexer.main"]
