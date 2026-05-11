@@ -2,6 +2,10 @@
 
 import type { ServiceProject } from '../../lib/services-loader';
 
+function escapeHtml(s: string): string {
+  return s.replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]!);
+}
+
 export function mountProjectPicker(
   container: HTMLElement,
   projects: ServiceProject[],
@@ -15,12 +19,11 @@ export function mountProjectPicker(
   }
   container.innerHTML = projects
     .map((p) => {
-      const safe = p.title.replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]!);
       const layerCount = p.layers.filter((l) => l.geom_type !== 'No geometry').length;
       return (
-        `<button class="project-card" data-slug="${p.slug}" data-active="${p.slug === currentSlug}">` +
-        `<span class="project-card__title">${safe}</span>` +
-        `<span class="project-card__meta">${layerCount} Layer · ${p.themes.length} Themen · ${p.print_layouts.length} Drucklayouts</span>` +
+        `<button type="button" class="project-card" data-slug="${escapeHtml(p.slug)}" data-active="${p.slug === currentSlug}">` +
+          `<span class="project-card__title">${escapeHtml(p.title)}</span>` +
+          `<span class="project-card__meta">${layerCount} Layer · ${p.themes.length} Themen · ${p.print_layouts.length} Drucklayouts</span>` +
         `</button>`
       );
     })
@@ -28,7 +31,7 @@ export function mountProjectPicker(
   container.querySelectorAll<HTMLButtonElement>('button[data-slug]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const slug = btn.dataset.slug!;
-      window.dispatchEvent(new CustomEvent('planportal:project', { detail: { slug } }));
+      window.dispatchEvent(new CustomEvent('webgis:project', { detail: { slug } }));
     });
   });
 }

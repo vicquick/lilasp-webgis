@@ -12,7 +12,18 @@ import tempfile
 from pathlib import Path
 
 from . import config
-from .qgs_parse import ProjectMeta
+from .qgs_parse import ProjectMeta, TreeNode, Symbology
+
+
+def _symbology_dict(s: Symbology | None) -> dict | None:
+    if s is None:
+        return None
+    return {
+        "kind": s.kind,
+        "class_count": s.class_count,
+        "primary_color": s.primary_color,
+        "attr": s.attr,
+    }
 
 
 def _layer_dict(qgs_path: str, layer) -> dict:
@@ -36,7 +47,24 @@ def _layer_dict(qgs_path: str, layer) -> dict:
         "wfs_url": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={qgs_path}",
         "pmtiles_url": None,
         "style_url": None,
+        "symbology": _symbology_dict(layer.symbology),
     }
+
+
+def _tree_dict(node: TreeNode | None) -> dict | None:
+    if node is None:
+        return None
+    out: dict = {
+        "kind": node.kind,
+        "name": node.name,
+        "expanded": node.expanded,
+        "checked": node.checked,
+    }
+    if node.kind == "layer":
+        out["layer_id"] = node.layer_id
+    else:
+        out["children"] = [_tree_dict(c) for c in node.children if c is not None]
+    return out
 
 
 def _project_dict(p: ProjectMeta) -> dict:
@@ -47,6 +75,7 @@ def _project_dict(p: ProjectMeta) -> dict:
         "crs": p.crs,
         "bbox": list(p.bbox) if p.bbox else None,
         "layers": [_layer_dict(qgs_path, l) for l in p.layers],
+        "tree": _tree_dict(p.tree),
         "themes": [
             {"name": t.name, "visible_layer_ids": t.visible_layer_ids}
             for t in p.themes
@@ -65,7 +94,7 @@ def emit(projects: list[ProjectMeta], target: Path | None = None) -> Path:
     target = target or config.WEB_SERVICES_JSON
     target.parent.mkdir(parents=True, exist_ok=True)
     payload = {
-        "version": 1,
+        "version": 2,
         "projects": [_project_dict(p) for p in projects],
     }
     # Atomic write — the SPA fetches this on every page load.

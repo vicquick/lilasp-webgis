@@ -1,21 +1,38 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#7c5cb0" />
-    <title>Planportal · LILASp</title>
+    <meta name="theme-color" content="#0c1416" />
+    <title>WebGIS · LILASp</title>
     <link rel="preconnect" href="https://rsms.me" crossorigin />
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%237c5cb0'%3E%3Cpath d='M3 3l9 4 9-4-9 18z'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232dd4bf'%3E%3Cpath d='M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z'/%3E%3C/svg%3E" />
+    <script>
+      // Apply persisted color scheme inline so first paint is correct.
+      (function () {
+        try {
+          var v = localStorage.getItem('webgis.theme');
+          var s = (v === 'light' || v === 'dark') ? v : 'dark';
+          document.documentElement.setAttribute('data-theme', s);
+          document.documentElement.style.colorScheme = s;
+        } catch (_) { /* localStorage blocked */ }
+      })();
+    </script>
   </head>
   <body>
-    <div id="root" class="app">
+    <div id="root" class="app" data-mobile-panel="closed">
       <header class="topbar">
+        <button class="icon-btn topbar__menu" id="topbar-menu" aria-label="Menü" hidden>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
         <div class="brand">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 3l9 4 9-4-9 18z"/></svg>
-          <span class="brand__name">Planportal</span>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+            <path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z"/>
+          </svg>
+          <span class="brand__name">WebGIS</span>
+          <span class="brand__tagline">LILASp</span>
         </div>
         <div class="topbar__divider"></div>
         <div class="topbar__project" id="topbar-project">
@@ -26,10 +43,15 @@
         <div class="topbar__status" id="status-pill" aria-live="polite">
           <span class="dot dot--ok"></span><span class="status-text">bereit</span>
         </div>
+        <button class="icon-btn topbar__theme" id="topbar-theme" aria-label="Hell/Dunkel umschalten" title="Hell/Dunkel">
+          <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
         <div class="topbar__user" id="userinfo" aria-live="polite">…</div>
       </header>
 
       <aside class="sidebar" id="sidebar" aria-label="Navigation">
+        <div class="sidebar__grabber" aria-hidden="true"></div>
         <section class="panel" id="panel-projects">
           <header class="panel__head">
             <h2 class="panel__title">Projekte</h2>
@@ -40,6 +62,7 @@
         <section class="panel" id="panel-themes" hidden>
           <header class="panel__head">
             <h2 class="panel__title">Karten-Thema</h2>
+            <span class="panel__hint" id="theme-hint"></span>
           </header>
           <div class="panel__body" id="map-themes"></div>
         </section>
@@ -73,7 +96,12 @@
         <div class="map-overlay map-overlay--toast" id="map-toast" hidden></div>
       </main>
 
+      <button class="fab" id="fab-inspector" aria-label="Inspektor öffnen" hidden>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7v.01"/></svg>
+      </button>
+
       <aside class="inspector" id="inspector" data-open="false" aria-label="Informationen">
+        <div class="sidebar__grabber" aria-hidden="true"></div>
         <header class="inspector__head">
           <h2 class="inspector__title" id="inspector-title">Inspektor</h2>
           <button class="icon-btn" id="inspector-close" aria-label="Schließen">
@@ -83,6 +111,8 @@
         <div class="inspector__tabs" id="inspector-tabs"></div>
         <div class="inspector__body" id="inspector-body"></div>
       </aside>
+
+      <div class="backdrop" id="mobile-backdrop" hidden></div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
