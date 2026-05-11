@@ -35,6 +35,7 @@ class ProjectMeta:
     title: str
     crs: str
     bbox: tuple[float, float, float, float] | None
+    qgs_file: str = ""  # basename, e.g. "cuxhaven.qgz" or "cuxhaven_lite.qgs"
     layers: list[Layer] = field(default_factory=list)
     themes: list[Theme] = field(default_factory=list)
     print_layouts: list[str] = field(default_factory=list)
@@ -142,6 +143,7 @@ def parse_qgs(qgs_path: Path, *, slug: str | None = None) -> ProjectMeta:
         title=title,
         crs=crs,
         bbox=bbox,
+        qgs_file=qgs_path.name,
         layers=layers,
         themes=themes,
         print_layouts=print_layouts,

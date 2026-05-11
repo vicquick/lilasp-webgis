@@ -15,8 +15,13 @@ from . import config
 from .qgs_parse import ProjectMeta
 
 
-def _layer_dict(slug: str, layer) -> dict:
-    """Per-layer record. Includes vector-tile URL if eligibility set."""
+def _layer_dict(qgs_path: str, layer) -> dict:
+    """Per-layer record. Includes vector-tile URL if eligibility set.
+
+    `qgs_path` is the MAP= value as py-qgis-server should see it, relative
+    to QGSRV_CACHE_ROOTDIR — i.e. `<slug>/<file>` where <file> is the
+    actual on-disk basename (.qgs OR .qgz).
+    """
     return {
         "id": layer.id,
         "name": layer.name,
@@ -24,31 +29,33 @@ def _layer_dict(slug: str, layer) -> dict:
         "geom_type": layer.geom_type,
         "crs": layer.crs,
         "wms_visible": layer.wms_visible,
-        "wms_url": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={slug}/{slug}.qgz",
+        "wms_url": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={qgs_path}",
         "wms_layer_name": layer.id,
-        "wfs_url": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={slug}/{slug}.qgz",
-        # Indexer fills these after bake; default null.
+        "wfs_url": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={qgs_path}",
         "pmtiles_url": None,
         "style_url": None,
     }
 
 
 def _project_dict(p: ProjectMeta) -> dict:
+    qgs_path = f"{p.slug}/{p.qgs_file or f'{p.slug}.qgz'}"
     return {
         "slug": p.slug,
         "title": p.title,
         "crs": p.crs,
         "bbox": list(p.bbox) if p.bbox else None,
-        "layers": [_layer_dict(p.slug, l) for l in p.layers],
+        "layers": [_layer_dict(qgs_path, l) for l in p.layers],
         "themes": [
             {"name": t.name, "visible_layer_ids": t.visible_layer_ids}
             for t in p.themes
         ],
         "print_layouts": p.print_layouts,
         "endpoints": {
-            "wms": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={p.slug}/{p.slug}.qgz",
-            "print": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={p.slug}/{p.slug}.qgz",
+            "wms": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={qgs_path}",
+            "wfs": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={qgs_path}",
+            "print": f"{config.PUBLIC_QGIS_BASE}/ows/?MAP={qgs_path}",
         },
+        "qgs_file": p.qgs_file,
     }
 
 

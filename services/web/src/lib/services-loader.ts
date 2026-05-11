@@ -24,10 +24,11 @@ export interface ServiceProject {
   title: string;
   crs: string;
   bbox: [number, number, number, number] | null;
+  qgs_file?: string;
   layers: ServiceLayer[];
   themes: ServiceTheme[];
   print_layouts: string[];
-  endpoints: { wms: string; print: string };
+  endpoints: { wms: string; wfs?: string; print: string };
 }
 
 export interface ServicesPayload {

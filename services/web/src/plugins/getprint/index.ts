@@ -50,8 +50,9 @@ export function wirePrintForm(
       .map((l) => l.get('layer-id'))
       .filter(Boolean);
 
+    const qgsFile = project.qgs_file ?? `${project.slug}.qgz`;
     const params = new URLSearchParams({
-      MAP: `${project.slug}/${project.slug}.qgz`,
+      MAP: `${project.slug}/${qgsFile}`,
       SERVICE: 'WMS',
       VERSION: '1.3.0',
       REQUEST: 'GetPrint',
