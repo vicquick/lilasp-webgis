@@ -8,6 +8,8 @@ Cold-start sequence:
 """
 from __future__ import annotations
 
+from __future__ import annotations
+
 import asyncio
 import logging
 import shutil
@@ -71,6 +73,10 @@ def _find_project_qgs(slug_dir: Path) -> Path | None:
 
 
 async def _ingest_slug(slug: str) -> ProjectMeta | None:
+    """Parse + DB upsert. Capabilities verification + vector bakes run
+    in the background so the indexer never blocks initial scan on
+    py-qgis-server's slow first-load of large QGIS projects.
+    """
     slug_dir = config.QGS_ROOT / slug
     qgs = _find_project_qgs(slug_dir)
     if qgs is None:
@@ -84,29 +90,39 @@ async def _ingest_slug(slug: str) -> ProjectMeta | None:
         await db.record_event(slug, "parse_failed", {"error": str(e)})
         return None
 
-    ok, err = await caps_verify.verify(slug)
-    if not ok:
-        log.warning("caps verify failed", slug=slug, error=err[:200])
-        await db.record_event(slug, "caps_failed", {"error": err[:200]})
-        await db.upsert_project(
-            meta,
-            qgs_path=str(qgs),
-            qgs_mtime=datetime.fromtimestamp(qgs.stat().st_mtime, tz=timezone.utc),
-            status="error",
-        )
-        return meta
-
     await db.upsert_project(
         meta,
         qgs_path=str(qgs),
         qgs_mtime=datetime.fromtimestamp(qgs.stat().st_mtime, tz=timezone.utc),
         status="active",
     )
-    log.info("ingested", slug=slug, layers=len(meta.layers), themes=len(meta.themes))
+    log.info(
+        "ingested",
+        slug=slug,
+        layers=len(meta.layers),
+        themes=len(meta.themes),
+        bbox=bool(meta.bbox),
+    )
 
-    # Fire-and-forget bake for vector-eligible layers.
+    # Background tasks — don't block the initial scan.
+    asyncio.create_task(_verify_in_background(meta, qgs))
     asyncio.create_task(_bake_eligible(meta))
     return meta
+
+
+async def _verify_in_background(meta: ProjectMeta, qgs: "Path") -> None:
+    ok, err = await caps_verify.verify(meta.slug)
+    if not ok:
+        log.warning("caps verify failed", slug=meta.slug, error=err[:200])
+        await db.record_event(meta.slug, "caps_failed", {"error": err[:200]})
+        await db.upsert_project(
+            meta,
+            qgs_path=str(qgs),
+            qgs_mtime=datetime.fromtimestamp(qgs.stat().st_mtime, tz=timezone.utc),
+            status="error",
+        )
+    else:
+        log.info("caps verify ok", slug=meta.slug)
 
 
 async def _bake_eligible(meta: ProjectMeta) -> None:
