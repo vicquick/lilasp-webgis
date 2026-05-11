@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Planportal — LILASp</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <span class="brand">Planportal</span>
+      <span class="project-title" id="project-title">—</span>
+      <span class="userinfo" id="userinfo">…</span>
+    </header>
+    <aside class="sidebar" id="sidebar">
+      <section id="project-picker"></section>
+      <section id="layer-tree"></section>
+      <section id="map-themes"></section>
+    </aside>
+    <main id="map" class="map"></main>
+    <aside class="inspector" id="inspector"></aside>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

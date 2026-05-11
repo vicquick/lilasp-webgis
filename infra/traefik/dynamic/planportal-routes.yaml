@@ -1,0 +1,66 @@
+# Planportal Traefik routes (Coolify production).
+# Routes /qgisserver, /tiles, /whoami, /services.json, /api/* — all gated
+# by authentik-auth except the login flow.
+
+http:
+  routers:
+    planportal-web:
+      rule: 'Host(`webgis.lilasp.de`)'
+      entryPoints: [https]
+      service: planportal-web
+      middlewares: [authentik-auth@file]
+      tls:
+        certResolver: letsencrypt
+
+    planportal-qgis:
+      rule: 'Host(`webgis.lilasp.de`) && PathPrefix(`/qgisserver`)'
+      entryPoints: [https]
+      service: planportal-qgis
+      middlewares: [authentik-auth@file, planportal-qgis-strip]
+      priority: 9000
+      tls:
+        certResolver: letsencrypt
+
+    planportal-tiles:
+      rule: 'Host(`webgis.lilasp.de`) && PathPrefix(`/tiles`)'
+      entryPoints: [https]
+      service: planportal-martin
+      middlewares: [authentik-auth@file, planportal-tiles-strip]
+      priority: 9000
+      tls:
+        certResolver: letsencrypt
+
+    planportal-whoami:
+      rule: 'Host(`webgis.lilasp.de`) && Path(`/whoami`)'
+      entryPoints: [https]
+      service: planportal-auth-gateway
+      middlewares: [authentik-auth@file]
+      priority: 9500
+      tls:
+        certResolver: letsencrypt
+
+  middlewares:
+    planportal-qgis-strip:
+      stripPrefix:
+        prefixes: ['/qgisserver']
+    planportal-tiles-strip:
+      stripPrefix:
+        prefixes: ['/tiles']
+
+  services:
+    planportal-web:
+      loadBalancer:
+        servers:
+          - url: 'http://planportal-web:80'
+    planportal-qgis:
+      loadBalancer:
+        servers:
+          - url: 'http://planportal-qgisserver:8080'
+    planportal-martin:
+      loadBalancer:
+        servers:
+          - url: 'http://planportal-martin:3000'
+    planportal-auth-gateway:
+      loadBalancer:
+        servers:
+          - url: 'http://planportal-auth-gateway:5000'

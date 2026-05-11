@@ -1,0 +1,36 @@
+.env
+.env.local
+*.bak
+*.bak.*
+*.qgs~
+*.tmp.qgs
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.log
+.DS_Store
+
+# Generated artefacts — emitted by indexer, never committed
+services/web/public/services.json
+/srv/
+*.pmtiles
+*.mbtiles
+
+# Large project assets (committed selectively, see projects/README.md)
+projects/**/*.gpkg
+projects/**/*.tif
+projects/**/*.tiff
+projects/**/cache/
+
+# Coolify local state
+.coolify/
+
+# Claude Code session artefacts
+.claude/

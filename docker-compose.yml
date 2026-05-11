@@ -1,0 +1,132 @@
+# Planportal — local dev stack.
+# Production runs each service as a standalone Coolify Dockerfile app.
+# See infra/coolify/README.md for the prod story.
+
+services:
+
+  # ── Postgres metadata DB (PostGIS) ────────────────────────────────────
+  postgres:
+    image: postgis/postgis:18-3.4
+    container_name: planportal-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 10s
+      retries: 8
+    networks: [planportal]
+
+  # ── Redis (caps + tile cache) ─────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: planportal-redis
+    networks: [planportal]
+
+  # ── QGIS Server (py-qgis-server) ──────────────────────────────────────
+  qgisserver:
+    build:
+      context: ./services/qgis-server
+    container_name: planportal-qgisserver
+    environment:
+      QGSRV_SERVER_WORKERS: ${QGSRV_SERVER_WORKERS}
+      QGSRV_SERVER_TIMEOUT: ${QGSRV_SERVER_TIMEOUT}
+      QGSRV_SERVER_HTTP_PROXY: 'yes'
+      QGSRV_SERVER_PROXY_URL: ${QGSRV_SERVER_PROXY_URL}
+      QGSRV_SERVER_MEMORY_HIGH_WATER_MARK: '0.85'
+      QGSRV_CACHE_SIZE: ${QGSRV_CACHE_SIZE}
+      QGSRV_CACHE_ROOTDIR: /srv/gis
+      QGSRV_CACHE_CHECK_INTERVAL: '300'
+      QGSRV_CACHE_STRICT_CHECK: 'no'
+      QGSRV_TRUST_LAYER_METADATA: 'yes'
+      QGSRV_LOGGING_LEVEL: ${QGSRV_LOGGING_LEVEL}
+      QGIS_SERVER_PARALLEL_RENDERING: '0'
+    volumes:
+      - gis-data:/srv/gis:ro
+      - qgis-home:/home/qgis
+    networks: [planportal]
+
+  # ── Martin (vector tiles) ─────────────────────────────────────────────
+  martin:
+    image: ghcr.io/maplibre/martin:v0.18.0
+    container_name: planportal-martin
+    command: ['--config', '/config/config.yaml']
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    volumes:
+      - ./services/martin/config.yaml:/config/config.yaml:ro
+      - tiles-data:/srv/tiles:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [planportal]
+
+  # ── Indexer (watchfiles + parser + emitter) ───────────────────────────
+  indexer:
+    build:
+      context: ./services/indexer
+    container_name: planportal-indexer
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      QGS_ROOT: ${QGS_ROOT}
+      TILES_ROOT: ${TILES_ROOT}
+      WEB_SERVICES_JSON: ${WEB_SERVICES_JSON}
+      PYQGIS_URL: ${PYQGIS_URL}
+      INDEXER_DEBOUNCE_SECONDS: ${INDEXER_DEBOUNCE_SECONDS}
+      QFC_BASE_URL: ${QFC_BASE_URL}
+      QFC_ADMIN_TOKEN: ${QFC_ADMIN_TOKEN}
+      QFC_SYNC_INTERVAL_MINUTES: ${QFC_SYNC_INTERVAL_MINUTES}
+    volumes:
+      - gis-data:/srv/gis
+      - tiles-data:/srv/tiles
+      - web-static:/srv/web
+      - ./projects:/srv/seed:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [planportal]
+
+  # ── Auth gateway (whoami sidecar) ─────────────────────────────────────
+  auth-gateway:
+    build:
+      context: ./services/auth-gateway
+    container_name: planportal-auth-gateway
+    environment:
+      AUTH_GATEWAY_BIND: ${AUTH_GATEWAY_BIND}
+    networks: [planportal]
+
+  # ── Web (OpenLayers SPA, served by nginx) ─────────────────────────────
+  web:
+    build:
+      context: ./services/web
+      args:
+        WEB_QGIS_BASE: ${WEB_QGIS_BASE}
+        WEB_TILES_BASE: ${WEB_TILES_BASE}
+        WEB_WHOAMI: ${WEB_WHOAMI}
+        WEB_SERVICES_JSON_URL: ${WEB_SERVICES_JSON_URL}
+    container_name: planportal-web
+    volumes:
+      - web-static:/usr/share/nginx/html/data:ro
+    ports:
+      - '8080:80'
+    depends_on:
+      - qgisserver
+      - martin
+      - auth-gateway
+    networks: [planportal]
+
+volumes:
+  postgres-data:
+  qgis-home:
+  gis-data:
+  tiles-data:
+  web-static:
+
+networks:
+  planportal:
+    name: planportal

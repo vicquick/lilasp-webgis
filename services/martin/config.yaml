@@ -1,0 +1,28 @@
+# Martin — vector tile server.
+# Auto-publish is intentionally OFF: PMTiles sources listed explicitly,
+# postgres tables enumerated in `tables:` to avoid leaking dev-only tables.
+# See: https://maplibre.org/martin/
+
+# yaml-language-server: $schema=https://raw.githubusercontent.com/maplibre/martin/main/schemas/config.json
+listen_addresses: '0.0.0.0:3000'
+worker_processes: 4
+keep_alive: 75
+
+cache_size_mb: 512
+
+postgres:
+  connection_string: '${DATABASE_URL}'
+  default_srid: 25832
+  pool_size: 10
+  # Explicit table list — populated by indexer at boot, no auto-publish.
+  tables: {}
+  functions: {}
+
+# PMTiles sources — one file per (project, map_theme). Indexer writes these
+# atomically (foo.pmtiles.new → mv → SIGHUP martin) because hot-reload of
+# PMTiles is not yet implemented upstream (maplibre/martin#2180).
+pmtiles:
+  sources: {}
+  # Indexer rewrites this section on bake; mounted as a generated overlay.
+
+# Reverse-proxy under /tiles via Traefik StripPrefix.

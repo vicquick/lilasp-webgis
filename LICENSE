@@ -1,0 +1,10 @@
+Copyright (c) 2026 LILASp
+
+This is an internal LILASp project. All rights reserved. Source is shared
+across LILASp infrastructure (Coolify, build systems, agents) but is not
+licensed for redistribution outside the organisation.
+
+Predecessor: This repository previously housed a QWC2-based viewer
+licensed under the BSD-2-Clause licence (Copyright Sourcepole AG /
+GeoSolutions Sas). That code is archived at git tag `archive/qwc2-2026-04-16`
+and remains BSD-2-Clause licensed for the lifetime of that tag.
