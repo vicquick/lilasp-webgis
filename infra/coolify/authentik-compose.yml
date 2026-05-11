@@ -1,0 +1,120 @@
+# Reference: Coolify "Add service → Authentik" template should produce
+# something equivalent. If you need to paste a custom compose into the
+# Coolify UI's "Docker Compose" service field, use this verbatim.
+#
+# Project: Authentik (uuid a4kwss4k0s844g8ws0ss088s)
+# Environment: production (uuid g8g4s0o0040ckcgksgocw4k8)
+# FQDN: auth.lilasp.de
+#
+# Required env vars at the Coolify service level:
+#   AUTHENTIK_POSTGRES_PASSWORD  — 48+ chars
+#   AUTHENTIK_SECRET_KEY         — 64+ chars (`openssl rand -base64 60`)
+#   AUTHENTIK_BOOTSTRAP_PASSWORD — first admin login (one-time)
+#   AUTHENTIK_BOOTSTRAP_TOKEN    — API token for initial automation
+# Secrets generated 2026-05-11 are stashed at /tmp/planportal-secrets.env
+# on the workserver (mode 600). Rotate before committing.
+
+services:
+
+  authentik-postgres:
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - authentik-postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: authentik
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: ${AUTHENTIK_POSTGRES_PASSWORD}
+
+  authentik-redis:
+    image: docker.io/library/redis:7-alpine
+    command: --save 60 1 --loglevel warning
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      retries: 5
+    volumes:
+      - authentik-redis:/data
+
+  authentik-server:
+    image: ghcr.io/goauthentik/server:2025.10
+    restart: unless-stopped
+    command: server
+    environment:
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-postgres
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRES_PASSWORD}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_ERROR_REPORTING__ENABLED: 'false'
+      AUTHENTIK_DISABLE_UPDATE_CHECK: 'true'
+      AUTHENTIK_DISABLE_STARTUP_ANALYTICS: 'true'
+      AUTHENTIK_AVATARS: initials
+      AUTHENTIK_BOOTSTRAP_PASSWORD: ${AUTHENTIK_BOOTSTRAP_PASSWORD}
+      AUTHENTIK_BOOTSTRAP_TOKEN: ${AUTHENTIK_BOOTSTRAP_TOKEN}
+      AUTHENTIK_BOOTSTRAP_EMAIL: victor.budinich@gmail.com
+      AUTHENTIK_LOG_LEVEL: info
+      AUTHENTIK_COOKIE_DOMAIN: lilasp.de
+    volumes:
+      - authentik-media:/media
+      - authentik-templates:/templates
+    depends_on:
+      authentik-postgres:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_healthy
+    expose:
+      - '9000'
+      - '9443'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=coolify"
+      - "traefik.http.routers.authentik.rule=Host(`auth.lilasp.de`)"
+      - "traefik.http.routers.authentik.entrypoints=https"
+      - "traefik.http.routers.authentik.tls=true"
+      - "traefik.http.routers.authentik.tls.certresolver=letsencrypt"
+      - "traefik.http.services.authentik.loadbalancer.server.port=9000"
+      # Outpost forward-auth endpoint, routed on any host via path prefix.
+      - "traefik.http.routers.authentik-outpost.rule=PathPrefix(`/outpost.goauthentik.io/`)"
+      - "traefik.http.routers.authentik-outpost.entrypoints=https"
+      - "traefik.http.routers.authentik-outpost.tls=true"
+      - "traefik.http.routers.authentik-outpost.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.authentik-outpost.service=authentik"
+
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:2025.10
+    restart: unless-stopped
+    command: worker
+    environment:
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-postgres
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRES_PASSWORD}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_ERROR_REPORTING__ENABLED: 'false'
+    user: root
+    volumes:
+      - authentik-media:/media
+      - authentik-certs:/certs
+      - /var/run/docker.sock:/var/run/docker.sock
+      - authentik-templates:/templates
+    depends_on:
+      authentik-postgres:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_healthy
+
+volumes:
+  authentik-postgres:
+  authentik-redis:
+  authentik-media:
+  authentik-templates:
+  authentik-certs:
