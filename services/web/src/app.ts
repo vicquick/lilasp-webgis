@@ -24,21 +24,17 @@ const $ = (sel: string): HTMLElement => document.querySelector(sel) as HTMLEleme
 // ─── inspector helpers ─────────────────────────────────────────────
 
 const inspectorApi = {
-  open(title: string, html: string): void {
+  open(title: string, html: string, opts: { autoSurface?: boolean } = {}): void {
     $('#inspector-title').textContent = title;
     $('#inspector-body').innerHTML = html;
     const root = $('#root');
     root.setAttribute('data-inspector', 'true');
-    // On mobile, default to inspector sheet visible when something opens.
-    if (matchMedia('(max-width: 760px)').matches) {
-      root.setAttribute('data-mobile-panel', 'inspector');
-      $('#mobile-backdrop').toggleAttribute('hidden', false);
-      $('#mobile-backdrop').setAttribute('data-open', 'true');
-    }
+    const surface = opts.autoSurface !== false;
+    if (surface && isMobile()) openMobilePanel('info');
   },
   close(): void {
     $('#root').setAttribute('data-inspector', 'false');
-    closeMobilePanel();
+    if (isMobile()) closeMobilePanel();
   },
   setBusy(busy: boolean): void {
     document.body.style.cursor = busy ? 'progress' : '';
@@ -55,7 +51,7 @@ function escapeHtml(s: string): string {
   return s.replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]!);
 }
 
-function showProjectInfo(project: ServiceProject): void {
+function showProjectInfo(project: ServiceProject, opts: { autoSurface?: boolean } = {}): void {
   const renderable = project.layers.filter((l) => l.geom_type !== 'No geometry').length;
   const lookups = project.layers.filter((l) => l.geom_type === 'No geometry').length;
   const bboxText = project.bbox
@@ -73,6 +69,7 @@ function showProjectInfo(project: ServiceProject): void {
       <div class="feature__row"><dt>Karten-Themen</dt><dd>${project.themes.length}</dd></div>
       <div class="feature__row"><dt>Drucklayouts</dt><dd>${project.print_layouts.length}</dd></div>
     </dl>`,
+    opts,
   );
 }
 
@@ -91,52 +88,82 @@ function pickDefaultTheme(themes: ServiceTheme[]): ServiceTheme | null {
 }
 
 // ─── mobile sheet wiring ───────────────────────────────────────────
+//
+// On mobile we expose four bottom-tab targets via the persistent
+// quick-bar: 'projects' | 'themes' | 'layers' | 'info'. Each opens
+// the corresponding bottom-sheet (sidebar for the first three, the
+// inspector for 'info'). Tapping the active tab again closes.
+
+type MobileTab = 'projects' | 'themes' | 'layers' | 'info';
+type MobilePanel = MobileTab | 'closed';
 
 function isMobile(): boolean { return matchMedia('(max-width: 760px)').matches; }
 
-function openMobilePanel(which: 'sidebar' | 'inspector'): void {
+function syncQuickBar(active: MobilePanel): void {
+  document.querySelectorAll<HTMLButtonElement>('.quick-bar__btn').forEach((btn) => {
+    btn.toggleAttribute('data-active', false);
+    btn.setAttribute('data-active', btn.dataset.target === active ? 'true' : 'false');
+  });
+}
+
+function openMobilePanel(which: MobileTab): void {
   const root = $('#root');
   root.setAttribute('data-mobile-panel', which);
+  syncQuickBar(which);
   const bd = $('#mobile-backdrop');
   bd.removeAttribute('hidden');
   bd.setAttribute('data-open', 'true');
+  if (which === 'info' && state.current) {
+    root.setAttribute('data-inspector', 'true');
+  }
 }
 
 function closeMobilePanel(): void {
-  const root = $('#root');
-  root.setAttribute('data-mobile-panel', 'closed');
+  $('#root').setAttribute('data-mobile-panel', 'closed');
+  syncQuickBar('closed');
   const bd = $('#mobile-backdrop');
   bd.setAttribute('data-open', 'false');
-  // Hide after transition so it doesn't intercept clicks.
-  setTimeout(() => bd.setAttribute('hidden', ''), 260);
+  setTimeout(() => bd.setAttribute('hidden', ''), 280);
 }
 
 function wireMobileShell(): void {
-  // Show menu button + FAB on small screens.
+  // Toggle visibility of the quick-bar on viewport changes.
   const apply = () => {
     const mobile = isMobile();
-    const menuBtn = $('#topbar-menu') as HTMLButtonElement;
-    menuBtn.toggleAttribute('hidden', !mobile);
-    const fab = $('#fab-inspector') as HTMLButtonElement;
-    fab.toggleAttribute('hidden', !mobile);
+    $('#quick-bar').toggleAttribute('hidden', !mobile);
+    if (!mobile) {
+      // On widening, drop any sheet state so desktop layout is clean.
+      $('#root').setAttribute('data-mobile-panel', 'closed');
+      $('#mobile-backdrop').setAttribute('hidden', '');
+    }
   };
   apply();
   matchMedia('(max-width: 760px)').addEventListener('change', apply);
 
-  $('#topbar-menu').addEventListener('click', () => {
-    const cur = $('#root').getAttribute('data-mobile-panel');
-    if (cur === 'sidebar') closeMobilePanel();
-    else openMobilePanel('sidebar');
+  // Quick-bar buttons.
+  document.querySelectorAll<HTMLButtonElement>('.quick-bar__btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.target as MobileTab;
+      const cur = $('#root').getAttribute('data-mobile-panel');
+      if (cur === target) {
+        closeMobilePanel();
+        if (target === 'info') $('#root').setAttribute('data-inspector', 'false');
+        return;
+      }
+      if (target === 'info') {
+        if (state.current) showProjectInfo(state.current);
+      } else {
+        openMobilePanel(target);
+      }
+    });
   });
-  $('#fab-inspector').addEventListener('click', () => {
-    if (state.current) showProjectInfo(state.current);
-  });
+
   $('#mobile-backdrop').addEventListener('click', () => {
     closeMobilePanel();
-    // Closing inspector should also collapse the data-inspector grid.
-    if (isMobile()) inspectorApi.close();
+    $('#root').setAttribute('data-inspector', 'false');
   });
-  // Selecting a project on mobile dismisses the sidebar sheet.
+
+  // Selecting a project on mobile dismisses the sheet — the map is the prize.
   window.addEventListener('webgis:project', () => {
     if (isMobile()) closeMobilePanel();
   });
@@ -208,7 +235,10 @@ async function selectProject(slug: string): Promise<void> {
 
   mountProjectPicker($('#project-picker'), state.projects, slug, $('#projects-count'));
 
-  showProjectInfo(project);
+  // Populate the inspector silently — on desktop it slides in; on mobile
+  // it waits behind the "Info" tab until the user taps it. The map keeps
+  // centre stage on first paint.
+  showProjectInfo(project, { autoSurface: !isMobile() });
 
   history.replaceState(null, '', `?project=${encodeURIComponent(slug)}`);
 }
