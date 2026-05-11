@@ -205,7 +205,7 @@ services:
       # bcrypt hash with single `$` here. Password is the user-visible
       # one shared with the operator at deploy time; rotate before going
       # production-public.
-      - "traefik.http.middlewares.planportal-auth.basicauth.users=admin:$2y$05$jEbGLb8nzd9rlDkkn7E8vuYK4R/dSSEGBRKcZukTnmediC3wQu1xK"
+      - "traefik.http.middlewares.planportal-auth.basicauth.users=admin:$2a$12$MScbxcqm48G25ban2USL0epPQqGQkBY4TYN96qO0rB6D3P/d2i40u"
       - traefik.http.middlewares.planportal-auth.basicauth.realm=Planportal
 
 volumes:
