@@ -271,21 +271,35 @@ export function setAllLayers(
   container.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
+export interface ApplyThemeReport {
+  themeName: string;
+  /** Total renderable rows ON after applying. */
+  activeCount: number;
+  /** Layer IDs in the theme that have no renderable row (lookup tables etc.) */
+  missing: string[];
+}
+
 export function applyTheme(
   container: HTMLElement,
   builtMap: BuiltMap,
   project: ServiceProject,
   themeName: string,
-): void {
+): ApplyThemeReport {
   const theme = project.themes.find((t) => t.name === themeName);
-  if (!theme) return;
+  if (!theme) return { themeName, activeCount: 0, missing: [] };
   const want = new Set(theme.visible_layer_ids);
+  let activeCount = 0;
+  const seen = new Set<string>();
   container.querySelectorAll<HTMLInputElement>('input.layer-row__cb').forEach((cb) => {
     const id = cb.dataset.id!;
+    seen.add(id);
     const visible = want.has(id);
+    if (visible) activeCount++;
     cb.checked = visible;
     builtMap.toggleLayer(`${project.slug}__${id}`, visible);
   });
+  const missing = [...want].filter((id) => !seen.has(id));
   // Trigger group tri-state recompute via a bubbling change.
   container.dispatchEvent(new Event('change', { bubbles: true }));
+  return { themeName, activeCount, missing };
 }
