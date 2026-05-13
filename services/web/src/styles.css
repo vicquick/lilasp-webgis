@@ -618,6 +618,9 @@ html[data-theme='light'] .topbar__theme .icon-moon { display: none; }
   color: var(--text-dim);
   box-shadow: var(--shadow-sm);
 }
+/* The empty scale chip is reserved for a future scale-input widget —
+   until it has text content, don't paint an empty pill near the scale bar. */
+.readout:empty { display: none; }
 .readout--mono { font-family: var(--font-mono); font-size: 11px;
   font-variant-numeric: tabular-nums; }
 
