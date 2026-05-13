@@ -169,12 +169,17 @@ def forward():
         resp.headers["X-Authentik-Name"] = user
         return resp
 
-    # Build absolute next URL so the redirect lands on the right path
-    # after login.
+    # Build an ABSOLUTE Location URL pointing at the public host.
+    # Traefik's forwardAuth resolves relative Locations against the
+    # auth-server URL (http://auth-gateway:5000/...), which the user's
+    # browser cannot reach. We must emit `https://webgis.lilasp.de/...`
+    # so the redirect lands on the styled login page.
     host = request.headers.get("X-Forwarded-Host", request.host)
     proto = request.headers.get("X-Forwarded-Proto", "https")
     next_url = f"{proto}://{host}{uri}"
-    login_url = "/auth/login?next=" + urllib.parse.quote(next_url, safe="")
+    login_url = (
+        f"{proto}://{host}/auth/login?next=" + urllib.parse.quote(next_url, safe="")
+    )
     return redirect(login_url, code=302)
 
 
