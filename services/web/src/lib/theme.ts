@@ -1,4 +1,4 @@
-// Color-scheme manager. Persists choice in localStorage; defaults to "dark".
+// Color-scheme manager. Persists choice in localStorage; defaults to "light".
 //
 // Two valid values: "dark" | "light". CSS reads them off `<html data-theme="…">`.
 
@@ -8,8 +8,10 @@ const STORAGE_KEY = 'webgis.theme';
 export function getScheme(): ColorScheme {
   const v = localStorage.getItem(STORAGE_KEY);
   if (v === 'light' || v === 'dark') return v;
-  // First visit: dark by default (per product brief).
-  return 'dark';
+  // First visit: light by default. Office daylight + the darker teal
+  // accent reads better on the cream background; users who prefer
+  // dark can switch via the topbar moon icon.
+  return 'light';
 }
 
 export function setScheme(scheme: ColorScheme): void {

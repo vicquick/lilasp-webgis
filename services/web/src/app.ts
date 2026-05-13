@@ -51,6 +51,17 @@ function escapeHtml(s: string): string {
   return s.replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]!);
 }
 
+// ─── transient toast (top-center of map) ───────────────────────────
+
+let toastTimer: ReturnType<typeof setTimeout> | null = null;
+function showToast(text: string, kind: 'ok' | 'warn' = 'ok', ms = 2200): void {
+  const el = $('#map-toast');
+  el.innerHTML = `<div class="toast toast--${kind}">${escapeHtml(text)}</div>`;
+  el.removeAttribute('hidden');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.setAttribute('hidden', ''), ms);
+}
+
 function showProjectInfo(project: ServiceProject, opts: { autoSurface?: boolean } = {}): void {
   const renderable = project.layers.filter((l) => l.geom_type !== 'No geometry').length;
   const lookups = project.layers.filter((l) => l.geom_type === 'No geometry').length;
@@ -228,18 +239,21 @@ async function selectProject(slug: string): Promise<void> {
       btn.setAttribute('data-active', btn.dataset.theme === themeName ? 'true' : 'false');
     });
   };
+  const prettyTheme = (name: string) => name.replace(/[_\s]+/g, ' · ').trim();
   if (defaultTheme) {
     applyTheme(layerTreeEl, builtMap, project, defaultTheme.name);
     setActiveTheme(defaultTheme.name);
   } else {
     setActiveTheme(null);
   }
-  // Re-wire map-theme select to also update chip state when changed.
   mountMapThemeSelect($('#map-themes'), project, (themeName) => {
-    applyTheme(layerTreeEl, builtMap, project, themeName);
+    const report = applyTheme(layerTreeEl, builtMap, project, themeName);
     setActiveTheme(themeName);
-    // On mobile, close the themes sheet so the user sees the canvas
-    // update. Without this the change is invisible behind the sheet.
+    // Visible feedback even if the visual change is subtle (raster
+    // basemap-only themes, symbols hidden behind missing SVGs, etc).
+    const kind = report.activeCount === 0 ? 'warn' : 'ok';
+    const noun = report.activeCount === 1 ? 'Layer' : 'Layer';
+    showToast(`${prettyTheme(themeName)} · ${report.activeCount} ${noun} aktiv`, kind);
     if (isMobile()) closeMobilePanel();
   }, defaultTheme?.name ?? null);
 
@@ -268,9 +282,10 @@ async function boot(): Promise<void> {
   wireMobileShell();
   wireThemeToggle();
 
-  const userEl = $('#userinfo');
+  const userEl = $('#userinfo') as HTMLAnchorElement;
   const who = await fetchWhoAmI();
-  userEl.textContent = who ? who.user : 'admin';
+  userEl.textContent = who?.user ?? 'admin';
+  userEl.title = `${userEl.textContent} · klicken zum Abmelden`;
 
   let payload;
   try {

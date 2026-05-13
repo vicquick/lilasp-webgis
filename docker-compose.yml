@@ -151,9 +151,19 @@ services:
   auth-gateway:
     build:
       context: ./services/auth-gateway
-    # python:3.12-slim has no `wget`. The Dockerfile sets a python-based
-    # healthcheck, but Compose-level config overrides it — keep the same
-    # urllib trick here so Coolify sees the container as healthy.
+    environment:
+      # Bcrypt user table. `|`-separated entries of `user:bcrypt-hash`.
+      # The literal `$` in the bcrypt hash MUST be doubled here so
+      # docker-compose treats them as literals instead of variable
+      # interpolation. Coolify additionally renders `$$` back to `$` —
+      # quadrupling collapses to single `$` at runtime.
+      WEBGIS_AUTH_USERS: 'admin:$$2a$$12$$MScbxcqm48G25ban2USL0epPQqGQkBY4TYN96qO0rB6D3P/d2i40u'
+      # HMAC signing secret for the session cookie. MUST be set; the
+      # service refuses to start otherwise.
+      WEBGIS_AUTH_SECRET: ${WEBGIS_AUTH_SECRET}
+      WEBGIS_AUTH_TTL_DAYS: ${WEBGIS_AUTH_TTL_DAYS:-7}
+    # python:3.12-slim has no `wget`. Use python urllib so Coolify
+    # sees the container as healthy.
     healthcheck:
       test:
         - 'CMD-SHELL'
@@ -222,14 +232,15 @@ services:
       - traefik.http.middlewares.planportal-rl.ratelimit.average=60
       - traefik.http.middlewares.planportal-rl.ratelimit.burst=120
       - traefik.http.middlewares.planportal-rl.ratelimit.period=1s
-      # ── basic-auth interim (until Authentik forward-auth replaces it) ──
-      # Coolify auto-escapes `$` → `$$` in labels before docker-compose
-      # render, which then unescapes back to `$`. So we write the literal
-      # bcrypt hash with single `$` here. Password is the user-visible
-      # one shared with the operator at deploy time; rotate before going
-      # production-public.
-      - "traefik.http.middlewares.planportal-auth.basicauth.users=admin:$2a$12$MScbxcqm48G25ban2USL0epPQqGQkBY4TYN96qO0rB6D3P/d2i40u"
-      - traefik.http.middlewares.planportal-auth.basicauth.realm=Planportal
+      # ── forwardAuth (replaces basicauth) ──
+      # Each protected request asks auth-gateway:5000/auth/forward whether
+      # the user is logged in. 200 = pass through (with identity headers
+      # injected via authResponseHeaders); 302 = browser follows to our
+      # styled /auth/login page. /auth/* itself bypasses the check
+      # server-side so the login page can be reached.
+      - traefik.http.middlewares.planportal-auth.forwardauth.address=http://auth-gateway:5000/auth/forward
+      - traefik.http.middlewares.planportal-auth.forwardauth.authResponseHeaders=X-Authentik-Username,X-Authentik-Email,X-Authentik-Name,X-Authentik-Groups,X-Authentik-Uid
+      - traefik.http.middlewares.planportal-auth.forwardauth.trustForwardHeader=true
 
 volumes:
   postgres-data:
