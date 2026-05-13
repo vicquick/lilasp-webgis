@@ -157,6 +157,10 @@ async def _initial_scan() -> list[ProjectMeta]:
     for entry in config.QGS_ROOT.iterdir():
         if not entry.is_dir():
             continue
+        # Skip dot-prefixed directories: convention for disabled /
+        # archived / hidden projects (e.g. `.cuxhaven_lite.disabled-…`).
+        if entry.name.startswith("."):
+            continue
         meta = await _ingest_slug(entry.name)
         if meta:
             metas.append(meta)
