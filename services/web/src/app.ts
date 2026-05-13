@@ -238,6 +238,9 @@ async function selectProject(slug: string): Promise<void> {
   mountMapThemeSelect($('#map-themes'), project, (themeName) => {
     applyTheme(layerTreeEl, builtMap, project, themeName);
     setActiveTheme(themeName);
+    // On mobile, close the themes sheet so the user sees the canvas
+    // update. Without this the change is invisible behind the sheet.
+    if (isMobile()) closeMobilePanel();
   }, defaultTheme?.name ?? null);
 
   mountIdentify(builtMap.map, project, inspectorApi);

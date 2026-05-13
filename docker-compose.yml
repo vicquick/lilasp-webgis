@@ -72,6 +72,13 @@ services:
       QGSRV_DISABLE_GETPRINT: 'yes'
       QGSRV_LOGGING_LEVEL: ${QGSRV_LOGGING_LEVEL:-INFO}
       QGIS_SERVER_PARALLEL_RENDERING: '0'
+      # SVG marker resolution. QGIS resolves project-relative paths
+      # (e.g. "260414/Leuchtturm.svg") against the .qgz directory, but
+      # falls back to QGIS_DEFAULT_SVG_PATHS. Point both to /srv/gis so
+      # any SVG dir co-located with a project — or dropped at the
+      # /srv/gis root — is picked up without per-project config.
+      QGIS_DEFAULT_SVG_PATHS: '/srv/gis'
+      QGIS_SERVER_DEFAULT_SVG_PATHS: '/srv/gis'
     volumes:
       # Host bind-mount: project files (.qgz with embedded creds) live OFF git.
       - /srv/gis-staging:/srv/gis:ro
@@ -144,8 +151,13 @@ services:
   auth-gateway:
     build:
       context: ./services/auth-gateway
+    # python:3.12-slim has no `wget`. The Dockerfile sets a python-based
+    # healthcheck, but Compose-level config overrides it — keep the same
+    # urllib trick here so Coolify sees the container as healthy.
     healthcheck:
-      test: ['CMD-SHELL', 'wget -q -O- http://127.0.0.1:5000/health >/dev/null || exit 1']
+      test:
+        - 'CMD-SHELL'
+        - 'python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen(''http://127.0.0.1:5000/health'',timeout=3).status==200 else 1)" || exit 1'
       interval: 30s
       timeout: 5s
       retries: 5
