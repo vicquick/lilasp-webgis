@@ -115,6 +115,9 @@ export interface BuiltMap {
   setBasemap: (key: BasemapKey | null) => void;
   getBasemap: () => BasemapKey | null;
   toggleLayer: (id: string, visible: boolean) => void;
+  /** Override the WMS `STYLES` param on a single project layer.
+      Pass empty string to drop the override (= QGIS default style). */
+  setLayerStyle: (id: string, styleName: string) => void;
   fitToProject: () => void;
 }
 
@@ -191,6 +194,15 @@ export function createProjectMap(
     toggleLayer(id, visible) {
       const lyr = map.getAllLayers().find((l) => l.get('id') === id);
       lyr?.setVisible(visible);
+    },
+    setLayerStyle(id, styleName) {
+      const lyr = map.getAllLayers().find((l) => l.get('id') === id);
+      if (!lyr) return;
+      const src = (lyr as TileLayer<TileWMS>).getSource();
+      if (!src) return;
+      // updateParams resets the tile cache so the next render request
+      // hits QGIS Server with the new style — no manual cache clear.
+      src.updateParams({ STYLES: styleName || '' });
     },
     fitToProject() {
       if (extent) view.fit(extent, { padding: [40, 40, 40, 40], duration: 280, maxZoom: 18 });

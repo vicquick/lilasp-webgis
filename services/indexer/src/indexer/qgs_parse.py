@@ -75,6 +75,12 @@ class TreeNode:
 class Theme:
     name: str
     visible_layer_ids: list[str]
+    # Per-layer style override carried by the visibility-preset.
+    # QGIS lets a layer have multiple named styles ("default", "A1",
+    # "luftbild"); a preset says which one to render under that theme.
+    # The WMS `STYLES=` parameter eats these names verbatim.
+    # Empty value or absent key → the layer's default style is used.
+    layer_styles: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
@@ -283,14 +289,28 @@ def parse_qgs(qgs_path: Path, *, slug: str | None = None) -> ProjectMeta:
 
     themes: list[Theme] = []
     for preset in root.findall(".//visibility-presets/visibility-preset"):
+        visible_ids: list[str] = []
+        styles: dict[str, str] = {}
+        for layer in preset.findall("./layer"):
+            lid = layer.get("id")
+            if not lid:
+                continue
+            if layer.get("visible") == "1":
+                visible_ids.append(lid)
+            # Capture the style for every layer in the preset (visible
+            # or not); the user may toggle a layer back on via the
+            # layer-tree after picking the theme, and we want the
+            # right named style on it then too. We skip the literal
+            # "default" since omitting STYLES means default anyway,
+            # and an empty dict ships less bytes.
+            style_name = (layer.get("style") or "").strip()
+            if style_name and style_name != "default":
+                styles[lid] = style_name
         themes.append(
             Theme(
                 name=preset.get("name") or "",
-                visible_layer_ids=[
-                    layer.get("id") or ""
-                    for layer in preset.findall("./layer")
-                    if layer.get("visible") == "1" and layer.get("id")
-                ],
+                visible_layer_ids=visible_ids,
+                layer_styles=styles,
             )
         )
 

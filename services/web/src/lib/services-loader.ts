@@ -58,6 +58,9 @@ export interface ServiceTreeNode {
 export interface ServiceTheme {
   name: string;
   visible_layer_ids: string[];
+  /** Per-layer named-style override (passed verbatim to WMS `STYLES=`).
+      Absent entries → the layer's default style is used. */
+  layer_styles: Record<string, string>;
 }
 
 export interface ServiceProject {

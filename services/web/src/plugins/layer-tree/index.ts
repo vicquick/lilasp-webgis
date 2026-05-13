@@ -288,6 +288,7 @@ export function applyTheme(
   const theme = project.themes.find((t) => t.name === themeName);
   if (!theme) return { themeName, activeCount: 0, missing: [] };
   const want = new Set(theme.visible_layer_ids);
+  const styles = theme.layer_styles ?? {};
   let activeCount = 0;
   const seen = new Set<string>();
   container.querySelectorAll<HTMLInputElement>('input.layer-row__cb').forEach((cb) => {
@@ -296,7 +297,12 @@ export function applyTheme(
     const visible = want.has(id);
     if (visible) activeCount++;
     cb.checked = visible;
-    builtMap.toggleLayer(`${project.slug}__${id}`, visible);
+    const mapLayerId = `${project.slug}__${id}`;
+    // Update the named style BEFORE toggling visibility so the first
+    // GetMap request after the layer turns on already carries the
+    // theme's style — no double-fetch with the default style first.
+    builtMap.setLayerStyle(mapLayerId, styles[id] ?? '');
+    builtMap.toggleLayer(mapLayerId, visible);
   });
   const missing = [...want].filter((id) => !seen.has(id));
   // Trigger group tri-state recompute via a bubbling change.
