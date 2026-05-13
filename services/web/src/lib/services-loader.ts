@@ -61,6 +61,10 @@ export interface ServiceTheme {
   /** Per-layer named-style override (passed verbatim to WMS `STYLES=`).
       Absent entries → the layer's default style is used. */
   layer_styles: Record<string, string>;
+  /** Group paths to expand under this theme (e.g. "ALKIS/Straßennetzwerk"). */
+  expanded_groups: string[];
+  /** Group paths to render as checked (group tri-state := all-on under this theme). */
+  checked_groups: string[];
 }
 
 export interface ServiceProject {

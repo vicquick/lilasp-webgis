@@ -81,6 +81,8 @@ def _project_dict(p: ProjectMeta) -> dict:
                 "name": t.name,
                 "visible_layer_ids": t.visible_layer_ids,
                 "layer_styles": t.layer_styles,
+                "expanded_groups": t.expanded_groups,
+                "checked_groups": t.checked_groups,
             }
             for t in p.themes
         ],
