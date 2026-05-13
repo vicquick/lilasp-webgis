@@ -84,15 +84,16 @@ function layerRowHtml(layer: ServiceLayer, checked: boolean): string {
   );
 }
 
-/** Build a `data-collapsed` group with nested rows. */
-function groupHtml(node: ServiceTreeNode, layerById: Map<string, ServiceLayer>, depth: number, leafCount: number): string {
+/** Build a `data-collapsed` group with nested rows.
+ *  `path` is the slash-joined group path (matches QGIS preset paths). */
+function groupHtml(node: ServiceTreeNode, layerById: Map<string, ServiceLayer>, path: string, leafCount: number): string {
   const safe = escapeHtml(node.name || '(unbenannt)');
   const collapsed = !node.expanded ? 'true' : 'false';
   const children = (node.children ?? [])
-    .map((c) => renderNode(c, layerById, depth + 1))
+    .map((c) => renderNode(c, layerById, path))
     .join('');
   return (
-    `<section class="layer-group" data-collapsed="${collapsed}">` +
+    `<section class="layer-group" data-collapsed="${collapsed}" data-path="${escapeHtml(path)}">` +
       `<div class="layer-group__head" role="button" tabindex="0">` +
         `<span class="layer-group__caret">` +
           `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>` +
@@ -114,7 +115,7 @@ function renderableLeaves(node: ServiceTreeNode, layerById: Map<string, ServiceL
   return (node.children ?? []).flatMap((c) => renderableLeaves(c, layerById));
 }
 
-function renderNode(node: ServiceTreeNode, layerById: Map<string, ServiceLayer>, depth: number): string {
+function renderNode(node: ServiceTreeNode, layerById: Map<string, ServiceLayer>, parentPath: string): string {
   if (node.kind === 'layer') {
     const l = node.layer_id ? layerById.get(node.layer_id) : undefined;
     if (!l || l.geom_type === 'No geometry') return '';
@@ -122,7 +123,9 @@ function renderNode(node: ServiceTreeNode, layerById: Map<string, ServiceLayer>,
   }
   const leafCount = renderableLeaves(node, layerById).length;
   if (!leafCount) return ''; // collapse groups that contain only no-geom leaves
-  return groupHtml(node, layerById, depth, leafCount);
+  // Root layer-tree-group has empty name; its children's path starts at the root name.
+  const path = parentPath ? `${parentPath}/${node.name}` : (node.name || '');
+  return groupHtml(node, layerById, path, leafCount);
 }
 
 /** Fallback: render a flat list if no tree was emitted (old indexer). */
@@ -152,7 +155,7 @@ export function mountLayerTree(
   }
 
   const treeHtml = project.tree
-    ? renderNode(project.tree, layerById, 0) || renderFlat(project)
+    ? renderNode(project.tree, layerById, '') || renderFlat(project)
     : renderFlat(project);
 
   container.classList.add('layer-tree');
@@ -191,18 +194,7 @@ export function mountLayerTree(
 
   // ── interaction: group caret toggles, tri-state checkboxes ───────
 
-  const refreshGroupStates = () => {
-    container.querySelectorAll<HTMLElement>('.layer-group').forEach((g) => {
-      const cb = g.querySelector<HTMLInputElement>(':scope > .layer-group__head > .layer-group__cb');
-      if (!cb) return;
-      const childChecks = g.querySelectorAll<HTMLInputElement>('.layer-row__cb');
-      const total = childChecks.length;
-      let on = 0;
-      childChecks.forEach((c) => { if (c.checked) on++; });
-      cb.checked = total > 0 && on === total;
-      cb.indeterminate = on > 0 && on < total;
-    });
-  };
+  const refreshGroups = () => refreshGroupStates(container);
 
   container.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
@@ -223,7 +215,7 @@ export function mountLayerTree(
     if (t.classList.contains('layer-row__cb')) {
       const id = t.dataset.id!;
       builtMap.toggleLayer(`${project.slug}__${id}`, t.checked);
-      refreshGroupStates();
+      refreshGroups();
     } else if (t.classList.contains('layer-group__cb')) {
       const group = t.closest('.layer-group');
       if (!group) return;
@@ -235,7 +227,7 @@ export function mountLayerTree(
           builtMap.toggleLayer(`${project.slug}__${id}`, want);
         }
       });
-      refreshGroupStates();
+      refreshGroups();
     }
   });
 
@@ -247,7 +239,36 @@ export function mountLayerTree(
     builtMap.fitToProject();
   });
 
-  refreshGroupStates();
+  refreshGroups();
+}
+
+// ─── group-state helpers (module-level so applyTheme can re-use) ────
+
+/** Recompute tri-state group checkboxes from their descendant row state.
+ *  Pure function: only reads/writes DOM. Safe to call any time. */
+export function refreshGroupStates(container: HTMLElement): void {
+  container.querySelectorAll<HTMLElement>('.layer-group').forEach((g) => {
+    const cb = g.querySelector<HTMLInputElement>(':scope > .layer-group__head > .layer-group__cb');
+    if (!cb) return;
+    const childChecks = g.querySelectorAll<HTMLInputElement>('.layer-row__cb');
+    const total = childChecks.length;
+    let on = 0;
+    childChecks.forEach((c) => { if (c.checked) on++; });
+    cb.checked = total > 0 && on === total;
+    cb.indeterminate = on > 0 && on < total;
+  });
+}
+
+/** Apply a theme's collapsed/expanded set of group paths to the rendered tree. */
+function applyGroupExpansion(container: HTMLElement, expanded: Set<string>): void {
+  // QGIS preset semantics: any path listed in `expanded-group-nodes` is
+  // open, anything else is closed. If the preset has NO expansion data
+  // (older .qgs) we keep the current state — no-op when expanded is empty.
+  if (!expanded.size) return;
+  container.querySelectorAll<HTMLElement>('.layer-group[data-path]').forEach((g) => {
+    const path = g.getAttribute('data-path') || '';
+    g.setAttribute('data-collapsed', expanded.has(path) ? 'false' : 'true');
+  });
 }
 
 // ─── theme / preset application (preserves group collapse state) ────
@@ -268,7 +289,7 @@ export function setAllLayers(
     cb.checked = visible;
     builtMap.toggleLayer(`${project.slug}__${id}`, visible);
   });
-  container.dispatchEvent(new Event('change', { bubbles: true }));
+  refreshGroupStates(container);
 }
 
 export interface ApplyThemeReport {
@@ -305,7 +326,16 @@ export function applyTheme(
     builtMap.toggleLayer(mapLayerId, visible);
   });
   const missing = [...want].filter((id) => !seen.has(id));
-  // Trigger group tri-state recompute via a bubbling change.
-  container.dispatchEvent(new Event('change', { bubbles: true }));
+
+  // Mirror the preset's group state. QGIS desktop expands the groups
+  // listed in `expanded-group-nodes` and collapses everything else
+  // under this theme. We do the same so the panel feels native.
+  applyGroupExpansion(container, new Set(theme.expanded_groups ?? []));
+
+  // Recompute tri-state group checkboxes from the new row state.
+  // We call directly — bubbling a `change` event on the container
+  // doesn't trigger the change listener (target isn't an input).
+  refreshGroupStates(container);
+
   return { themeName, activeCount, missing };
 }

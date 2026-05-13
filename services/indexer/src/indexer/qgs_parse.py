@@ -81,6 +81,12 @@ class Theme:
     # The WMS `STYLES=` parameter eats these names verbatim.
     # Empty value or absent key → the layer's default style is used.
     layer_styles: dict[str, str] = field(default_factory=dict)
+    # QGIS layer-tree group state under this theme. Group paths use
+    # `/` separators ("ALKIS/Straßennetzwerk/Straßen"). Anything not
+    # listed → default behaviour (the .qgs's own expanded/checked
+    # attributes on layer-tree-group elements).
+    expanded_groups: list[str] = field(default_factory=list)
+    checked_groups: list[str] = field(default_factory=list)
 
 
 @dataclass(slots=True)
@@ -306,11 +312,23 @@ def parse_qgs(qgs_path: Path, *, slug: str | None = None) -> ProjectMeta:
             style_name = (layer.get("style") or "").strip()
             if style_name and style_name != "default":
                 styles[lid] = style_name
+        expanded_groups = [
+            n.get("id") or ""
+            for n in preset.findall("./expanded-group-nodes/expanded-group-node")
+            if n.get("id")
+        ]
+        checked_groups = [
+            n.get("id") or ""
+            for n in preset.findall("./checked-group-nodes/checked-group-node")
+            if n.get("id")
+        ]
         themes.append(
             Theme(
                 name=preset.get("name") or "",
                 visible_layer_ids=visible_ids,
                 layer_styles=styles,
+                expanded_groups=expanded_groups,
+                checked_groups=checked_groups,
             )
         )
 

@@ -9,6 +9,7 @@ import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
 import OSM from 'ol/source/OSM';
 import XYZ from 'ol/source/XYZ';
+import { createXYZ } from 'ol/tilegrid';
 import { defaults as defaultControls, ScaleLine, Attribution } from 'ol/control';
 
 import type { ServiceProject } from './services-loader';
@@ -80,15 +81,25 @@ function projectLayers(project: ServiceProject): TileLayer<TileWMS>[] {
     .map((layer) => {
       const source = new TileWMS({
         url: layer.wms_url,
+        // 512-pixel tiles: matches QGIS-Server's recommended advanced
+        // WMS options (tile size 512, tiling mode on) — half as many
+        // GetMap round trips per viewport for the same coverage.
+        // QGIS-Server keeps a render cache keyed on (BBOX, WIDTH,
+        // HEIGHT) so consistent tile sizes also boost cache hits.
+        tileGrid: createXYZ({ tileSize: 512 }),
         params: {
           LAYERS: layer.wms_layer_name,
           FORMAT: 'image/png',
           TRANSPARENT: true,
           VERSION: '1.3.0',
+          TILED: true,
         },
         crossOrigin: 'anonymous',
         serverType: 'qgis',
+        // Disable OL's default tile-fade transition so the canvas
+        // snaps to its new state when the user switches theme.
         transition: 0,
+        cacheSize: 256,
       });
       const tile = new TileLayer({
         source,
