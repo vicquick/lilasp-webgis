@@ -77,7 +77,11 @@ def _project_dict(p: ProjectMeta) -> dict:
         "layers": [_layer_dict(qgs_path, l) for l in p.layers],
         "tree": _tree_dict(p.tree),
         "themes": [
-            {"name": t.name, "visible_layer_ids": t.visible_layer_ids}
+            {
+                "name": t.name,
+                "visible_layer_ids": t.visible_layer_ids,
+                "layer_styles": t.layer_styles,
+            }
             for t in p.themes
         ],
         "print_layouts": p.print_layouts,
